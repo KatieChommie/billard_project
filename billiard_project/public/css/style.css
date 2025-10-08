@@ -1,0 +1,62 @@
+/* /css/style.css */
+body{
+    font-family: "Noto Sans Thai", sans-serif;
+}
+/* สไตล์ Navbar */
+.navbar {
+    display: flex; /* ใช้ Flexbox จัดวางโลโก้และลิงก์ */
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #10704b;
+    color: white;
+}
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+}
+.navbar .nav-links li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+}
+
+/* สไตล์หน้าเมนู */
+.menu-container {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.menu-container .menu-grid {
+    display: grid;
+    /* ใช้ Grid เพื่อจัดวางเมนูเป็นตาราง */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.menu-container .menu-item {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-container .menu-item img {
+    width: 250px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.menu-container .price {
+    font-size: 1.5em;
+    color: #cc0000; /* สีแดงสำหรับราคา */
+    font-weight: bold;
+}
+
+.hero-section{
+    text-align: center;
+}
