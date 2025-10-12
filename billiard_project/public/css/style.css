@@ -1,24 +1,119 @@
 /* /css/style.css */
 body{
     font-family: "Noto Sans Thai", sans-serif;
+    background-image: url("/images/billiardbg.jpg");
+    background-position: center;
+    background-size: cover;
 }
-/* สไตล์ Navbar */
-.navbar {
-    display: flex; /* ใช้ Flexbox จัดวางโลโก้และลิงก์ */
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    background-color: #10704b;
-    color: white;
+/*header*/
+/* --------------------
+   BASE STYLES & RESET
+   -------------------- */
+:root {
+    --header-height: 4rem; /* ความสูงของ Navbar */
+    --primary-color: #008080; /* สีหลัก (Teal/น้ำเงินอมเขียว) */
+    --secondary-color: #f7f7f7; /* สีพื้นหลังอ่อนๆ */
+    --text-color: #333333;
+    --link-hover-color: #00b3b3;
+    --font-thai: 'Noto Sans Thai', sans-serif;
 }
-.navbar .nav-links {
-    list-style: none;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-thai);
+    color: var(--text-color);
+    background-color: #f4f4f4;
+}
+
+/* --------------------
+   HEADER & NAVBAR STYLING
+   -------------------- */
+.header {
+    width: 100%;
+    position: fixed; /* ให้ Navbar ลอยอยู่ด้านบนสุด */
+    top: 0;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.header__container {
+    height: var(--header-height);
     display: flex;
+    justify-content: space-between; /* จัดวางโลโก้, เมนู, ปุ่ม ให้ห่างกัน */
+    align-items: center;
+    padding: 0 1.5rem; /* Padding ซ้ายขวา */
 }
-.navbar .nav-links li a {
-    color: white;
+
+.header__logo {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 700;
     text-decoration: none;
-    padding: 10px 15px;
+}
+
+/* LINKS AND LISTS */
+.nav__list {
+    display: flex; /* ทำให้รายการเมนูเรียงเป็นแนวนอน */
+    list-style: none;
+    align-items: center;
+    gap: 1.5rem; /* ระยะห่างระหว่างเมนู */
+}
+
+.nav__link {
+    color: var(--text-color);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.nav__link:hover {
+    color: var(--primary-color);
+}
+
+/* ACTION BUTTONS (Login/Logout/Cart) */
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.action__cart i {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.nav__button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.nav__button:hover {
+    background-color: var(--link-hover-color);
+}
+
+/* MAIN CONTENT AREA */
+main {
+    padding-top: var(--header-height); /* ชดเชยความสูงของ Navbar ที่เป็น fixed */
+    min-height: calc(100vh - 4rem); /* ความสูงขั้นต่ำ */
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/*index*/
+.hero-section{
+    text-align: center;
 }
 
 /* สไตล์หน้าเมนู */
@@ -57,6 +152,30 @@ body{
     font-weight: bold;
 }
 
-.hero-section{
+/*branches*/
+.branches-container{
     text-align: center;
+}
+
+.branches-container .branches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.branches-container .list-of-branches {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.branches-container .list-of-branches img {
+    width: 250px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 15px;
 }
