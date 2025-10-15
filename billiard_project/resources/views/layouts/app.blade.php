@@ -19,23 +19,6 @@
     <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap' rel='stylesheet'>
 </head>
 <body>
-    <!--<header class = "header">
-        <a href="{{ route('home') }}" class = "nav__logo" style='color: inherit; text-decoration: none;'>Let's Billiard</a>
-         
-        <div class = "nav__menu" id = "nav-menu"></div>
-            <ul class='nav__list'>
-                <li class="nav__item"><a href="{{ route('home') }}" class = "nav__link">หน้าหลัก</a></li>
-                <li class="nav__item"><a href="{{ route('booking.branches') }}" class = "nav__link">สาขาของเรา</a></li>
-                <li class="nav__item"><a href="{{ route('booking.reservation') }}" class = "nav__link">จองโต๊ะ</a></li>
-                <li class="nav__item"><a href="{{ route('menu') }}" class = "nav__link">เมนูอาหาร</a></li>
-                <li class="nav__item"><a href="{{ route('reviews') }}" class = "nav__link">รีวิว</a></li>
-                
-                <div class = "nav__right-area">
-                    <a href="{{ route('login') }}" class = "nav__button">เข้าสู่ระบบ</a>
-                </div>
-            </ul>
-        </div>
-    </header>-->
     <header class="header">
         <div class="header__container">
         
@@ -45,16 +28,11 @@
             {{-- กล่องเมนูหลัก --}}
             <nav class="header__nav">
                 <ul class="nav__list">
-                
-                    {{-- ลิงก์หลักทั้งหมด --}}
                     <li class="nav__item"><a href="{{ route('home') }}" class="nav__link">หน้าหลัก</a></li>
-                    <li class="nav__item"><a href="{{ route('menu') }}" class="nav__link">เมนูอาหาร</a></li>
-                
-                    {{-- ✅ ลิงก์จองโต๊ะที่ถูกต้อง --}}
+                    <li class="nav__item"><a href="{{ route('booking.branches') }}" class="nav__link">สาขาของเรา</a></li>
                     <li class="nav__item"><a href="{{ route('booking.reservation') }}" class="nav__link">จองโต๊ะ</a></li>
-                
+                    <li class="nav__item"><a href="{{ route('menu') }}" class="nav__link">เมนูอาหาร</a></li>
                     <li class="nav__item"><a href="{{ route('reviews') }}" class="nav__link">รีวิว</a></li>
-                
                 </ul>
             </nav>
         
@@ -88,6 +66,9 @@
     <footer>
         <p style='text-align: center'>&copy; 2025 Billiard Reservation System</p>
     </footer>
-
+    
+    <script src="{{ asset('js/script.js') }}"></script>
+    {{-- ลิงก์ Boxicons (ถ้ายังไม่มี) --}}
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'> 
 </body>
 </html>
