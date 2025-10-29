@@ -1,11 +1,415 @@
-@import 'tailwindcss';
+/*@tailwind base;
+@tailwind components;
+@tailwind utilities;*/
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* /css/style.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
+:root {
+    --header-height: 4rem; /* ความสูงของ Navbar */
+    --primary-color: #218A0A; /* สีหลัก (Teal/น้ำเงินอมเขียว) */
+    --secondary-color: #f7f7f7; /* สีพื้นหลังอ่อนๆ */
+    --text-color: #333333;
+    --link-hover-color: #27B00C;
+    --font-thai: 'Prompt', sans-serif;
+}
+body{
+    font-family: var(--font-thai);
+    color: var(--text-color);
+    
+    background-image: url("/public/images/billiardbg.jpg");
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    overflow-y: scroll;
+    
+}
+
+/* HEADER & NAVBAR STYLING */
+.header {
+    width: 100%;
+    position: fixed; /* ให้ Navbar ลอยอยู่ด้านบนสุด */
+    top: 0;
+    left: 0;
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.header__container {
+    height: var(--header-height);
+    display: flex;
+    justify-content: space-between;  /* จัดวางโลโก้, เมนู, ปุ่ม ให้ห่างกัน */
+    align-items: center;
+    padding: 0 1.5rem; /* Padding ซ้ายขวา */
+}
+
+.header__logo {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    margin-right: auto;
+    white-space: nowrap;
+}
+
+#hamburger-icon {
+    display: none;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+
+/* LINKS AND LISTS */
+.nav__list {
+    display: flex; /* ทำให้รายการเมนูเรียงเป็นแนวนอน */
+    list-style: none;
+    justify-content: flex-end;
+    margin-left: auto;
+    align-items: center;
+    gap: 1.5rem; /* ระยะห่างระหว่างเมนู */
+}
+
+.nav__link {
+    color: var(--text-color);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.nav__link:hover {
+    color: var(--primary-color);
+}
+
+/* ACTION BUTTONS (Login/Logout/Cart) */
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 1.5rem;
+}
+
+.action__cart i {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.nav__button {
+    background-color: var(--primary-color);
+    color: white;
+    margin: 5px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 400;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.nav__button:hover {
+    background-color: var(--link-hover-color);
+}
+
+@media (max-width:799px){
+    .nav__list{
+        display: none;
+        position: absolute;
+        top: var(--header-height);
+        left: 0;
+        width: 100%;
+        background-color: var(--secondary-color);
+        flex-direction: column; /* เปลี่ยนรายการเมนูให้เป็นแนวตั้ง */
+        text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+        padding: 20px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+    }
+
+
+    #hamburger-icon {
+        display: block;
+        font-size: 1.7rem;
+        margin: 0;
+    }
+
+    .header__actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .nav__list.active{
+        display: flex;
+        transition: background-color 0.2s ease;
+    }
+
+
+}
+
+@media (max-width: 400px) {
+    .header__container {
+        padding: 0 15px; 
+    }
+    .header__actions {
+        gap: 8px;
+    }
+}
+
+/*หน้าหลัก*/
+main {
+    padding-top: var(--header-height); /* ชดเชยความสูงของ Navbar ที่เป็น fixed */
+    min-height: calc(100vh - 4rem); /* ความสูงขั้นต่ำ */
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    
+}
+
+/*Index-หน้าแรก*/
+.hero-section{
+    font-weight: 300;
+    font-size: 20px;
+    padding-top: var(--header-height);
+    color: white;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
+}
+
+.hero-section h1{
+    font-weight: 600;
+    text-align: center;
+}
+
+.services{
+    margin: 40px 20px;
+    text-align: center;
+}
+
+.hero-section .li-of-services ul {
+    list-style: none; /* ลบจุดนำหน้าเริ่มต้นของรายการ */
+    padding: 0;
+    margin: 30px 0; /* เพิ่มช่องว่างด้านบนและล่าง */
+    text-align: center; /* จัดให้อยู่กึ่งกลาง */
+}
+
+.hero-section .li-of-services li {
+    font-weight: 300;
+    color: white;
+    margin-bottom: 10px; /* เพิ่มช่องว่างระหว่างแต่ละรายการ */
+    line-height: 1.5;
+   
+}
+
+.cta-buttons{
+    display: flex;
+    justify-content: center;
+    
+}
+
+.cta-buttons .button{
+    margin: 5px;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-thai);
+    font-size: 20px; 
+    font-weight: 350;
+    text-decoration: none;
+    color: #000;
+    background-color: var(--primary-color);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    outline: none;
+}
+
+.cta-buttons .button:hover {
+  background-color: var(--link-hover-color);
+  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.cta-buttons .button:active {
+  transform: translateY(-1px);
+}
+
+.lead2{
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    
+}
+
+.lead2 .regis-button-inline{
+    margin: 5px;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-thai);
+    font-size: 20px; 
+    font-weight: 350;
+    text-decoration: none;
+    color: #000;
+    background-color: var(--primary-color);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    outline: none;
+}
+
+.lead2 .regis-button-inline:hover {
+  background-color: var(--link-hover-color);
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.lead2 .regis-button-inline:active {
+  transform: translateY(-1px);
+}
+
+/*Login*/
+
+.login-card {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-width: 420px;
+    width: 100%;
+}
+
+.login-card h2 {
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+    border: none;
+    border-bottom: 2px solid var(--light-bg);
+    outline: none;
+    font-size: 1rem;
+    background: transparent;
+    transition: border-bottom-color 0.3s;
+}
+
+.input-group label {
+    position: absolute;
+    top: 1rem;
+    left: 0.5rem;
+    color: #999;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+    top: -0.5rem;
+    left: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.input-group input:focus {
+    border-bottom-color: var(--focus-border);
+}
+
+.login-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    border: none;
+    box-shadow: 0 4px 10px rgba(33, 138, 10, 0.4);
+}
+
+.login-btn:hover {
+    background-color: #1a6f08;
+}
+
+.link-footer {
+    color: var(--primary-color);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.link-footer:hover {
+    text-decoration: underline;
+}
+
+
+/*Branches*/
+.branches-container{
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.branches-container .branch-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/*Menu*/
+.menu-container {
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    
+}
+
+.menu-container .menu-grid {
+    display: grid;
+    /* ใช้ Grid เพื่อจัดวางเมนูเป็นตาราง */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.menu-container .menu-item {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-container .menu-item img {
+    width: 250px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.menu-container .price {
+    font-size: 1.5em;
+    color: #cc0000; /* สีแดงสำหรับราคา */
+    font-weight: bold;
+}
+
