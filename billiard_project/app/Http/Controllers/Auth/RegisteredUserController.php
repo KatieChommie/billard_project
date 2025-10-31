@@ -31,13 +31,19 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:30', 'unique:'.User::class], // ตรวจสอบ username
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'phone_number' => ['required', 'string', 'max:10'], // ตรวจสอบเบอร์โทร
+            'date_of_birth' => ['required', 'date'], // ตรวจสอบวันเกิด
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'username' => $request->username, // <-- ส่งค่า Username
             'email' => $request->email,
+            'phone_number' => $request->phone_number, // <-- ส่งค่าเบอร์โทร
+            'date_of_birth' => $request->date_of_birth, // <-- ส่งค่าวันเกิด
             'password' => Hash::make($request->password),
         ]);
 
@@ -45,6 +51,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('user.dashboard', absolute: false));
     }
 }

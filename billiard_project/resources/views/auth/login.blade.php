@@ -1,47 +1,68 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+@extends('layouts.app')
+@section('title', 'เข้าสู่ระบบ')
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+@section('content')
+<div class="login-page-container">
+    <div class="login-card">
+        <h2 class="login-card-title">เข้าสู่ระบบ Let's Billiard</h2>
+        
+        <form method="POST" action="{{ route('login') }}" autocomplete="off">
+            @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+            {{-- ** แสดงข้อผิดพลาด Validation ** --}}
+            @if ($errors->any())
+                <div class="error-message mb-4">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+            <!-- Email/Username Address (ใช้ user_email เพื่อให้ตรงกับ Logic) -->
+            <div class="input-group">
+                {{-- ต้องมี placeholder=" " เพื่อให้ Floating Label ทำงาน --}}
+                <input type="text" id="email" name="email" placeholder=" " value="{{ old('email') }}" required autofocus>
+                <label for="email" class="input-label">ชื่อผู้ใช้งาน / อีเมล</label>
+            </div>
+            
+            <!-- Password -->
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder=" " required>
+                <label for="password" class="input-label">รหัสผ่าน</label>
+                <!--Toggle: use inline SVG (eye + optional slash) so icon displays even if icon font fails -->
+                <button type="button" id="togglePassword" class="password-toggle-btn" aria-label="Toggle password visibility" aria-pressed="false">
+                    <svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Eye outline -->
+                        <path d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.95 7-9.54 7S3.73 16.06 2.46 12z" />
+                        <circle cx="12" cy="12" r="3" />
+                        <!-- Slash (visible when password is hidden) -->
+                        <line id="iconSlash" x1="3" y1="3" x2="21" y2="21" style="display:inline;" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="flex-row justify-between align-center mb-4">
+                <div class="form-check">
+                    <input type="checkbox" id="remember_me" name="remember">
+                    <label for="remember_me">จำฉันไว้</label>
+                </div>
+                
+                @if (Route::has('password.request'))
+                    <a class="link-footer" href="{{ route('password.request') }}">
+                        ลืมรหัสผ่าน?
+                    </a>
+                @endif
+            </div>
+            
+            <button type="submit" class="login-btn mb-3">เข้าสู่ระบบ</button>
+        </form>
+        
+        <p class="text-center mt-3">
+            <a class="link-footer" href="{{ route('register') }}">ยังไม่มีบัญชีเหรอ? สร้างบัญชีใหม่สิ</a>
+        </p>
+    </div>
+</div>
+
+@endsection

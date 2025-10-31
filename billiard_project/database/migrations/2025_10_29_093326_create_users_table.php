@@ -23,7 +23,7 @@ return new class extends Migration
         $table->string('username', 30)->unique();      // คอลัมน์ที่ 7
         $table->string('phone_number', 10)->unique();   // คอลัมน์ที่ 8
         $table->date('date_of_birth');         // คอลัมน์ที่ 9
-        $table->integer('loyalty_points')->default(0); // คอลัมน์ที่ 10
+        $table->integer('loyalty_points')->default(100); // คอลัมน์ที่ 10
 
         // Laravel Timestamps (จะถูกสร้างท้ายสุดเสมอ)
         $table->timestamps();             // คอลัมน์ที่ 11 (created_at) & 12 (updated_at)

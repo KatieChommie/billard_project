@@ -117,7 +117,7 @@ body{
     background-color: var(--link-hover-color);
 }
 
-@media (max-width:799px){
+@media (max-width:1000px){
     .nav__list{
         display: none;
         position: absolute;
@@ -206,13 +206,13 @@ main {
    
 }
 
-.cta-buttons{
+.index-buttons{
     display: flex;
     justify-content: center;
     
 }
 
-.cta-buttons .button{
+.index-buttons .button{
     margin: 5px;
     padding: 10px 30px;
     border: none;
@@ -229,17 +229,18 @@ main {
     outline: none;
 }
 
-.cta-buttons .button:hover {
+.index-buttons .button:hover {
   background-color: var(--link-hover-color);
   box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.4);
   color: #fff;
   transform: translateY(-7px);
 }
 
-.cta-buttons .button:active {
+.index-buttons .button:active {
   transform: translateY(-1px);
 }
 
+/*คืออะไร*/
 .lead2{
     margin: 20px;
     display: flex;
@@ -276,14 +277,21 @@ main {
 }
 
 /*Login*/
+.login-page-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin:50px;
+    min-height: 84vh;;
+}
 
 .login-card {
     background-color: white;
-    padding: 2.5rem;
-    border-radius: 1rem;
+    padding: 20px 25px;
+    border-radius: 1.2rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     max-width: 420px;
-    width: 100%;
+    width: 500px;
 }
 
 .login-card h2 {
@@ -295,7 +303,7 @@ main {
 
 .input-group {
     position: relative;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.7rem;
 }
 
 .input-group input {
@@ -316,13 +324,62 @@ main {
     color: #999;
     pointer-events: none;
     transition: all 0.3s ease;
+    z-index: 5;
+}
+
+
+#password {
+    /* ปรับค่านี้ให้มากกว่า 40px หากไอคอนใหญ่ */
+    padding-right: 40px; 
+    /* ... rest of your existing input styles ... */
+}
+
+.password-toggle-btn {
+    position: absolute;
+    /* จัดตำแหน่งให้อยู่ด้านขวาและกึ่งกลางแนวตั้ง */
+    top: 50%; 
+    right: 15px; /* ปรับระยะห่างจากขอบขวา */
+    transform: translateY(-50%); /* ดึงกลับขึ้นมาครึ่งหนึ่งเพื่อจัดกึ่งกลาง */
+    
+    /* สไตล์ปุ่ม */
+    background: transparent; /* ใส่เป็นโปร่งใสเพื่อให้ดูเหมือนเป็นส่วนของ input */
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem; /* เล็กลงให้ชิด input */
+    color: #666; /* สีไอคอน */
+    font-size: 1.25rem; /* ขนาดไอคอน */
+    z-index: 20; /* ให้ปุ่มอยู่เหนือ input field */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.password-toggle-btn:hover {
+    color: var(--link-hover-color);
+}
+
+.password-toggle-btn:focus {
+    outline: none;
+}
+
+/* size the inline SVG used for the password toggle */
+.password-toggle-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: block;
+}
+
+/* Ensure the slash line inherits currentColor */
+.password-toggle-btn svg line {
+    stroke: currentColor;
 }
 
 .input-group input:focus ~ label,
 .input-group input:not(:placeholder-shown) ~ label {
     top: -0.5rem;
     left: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: var(--primary-color);
     font-weight: 600;
 }
@@ -331,13 +388,22 @@ main {
     border-bottom-color: var(--focus-border);
 }
 
+.form-check{
+    padding-top: 5px;
+    padding-bottom: 15px;
+}
+
 .login-btn {
     background-color: var(--primary-color);
     color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
     padding: 0.75rem;
     border-radius: 0.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-family: var(--font-thai);
+    font-size: 1.2rem;
+    font-weight: 300;
+    letter-spacing: 0.7px;
     cursor: pointer;
     transition: background-color 0.3s;
     width: 100%;
@@ -350,6 +416,8 @@ main {
 }
 
 .link-footer {
+    padding-top: 10px;
+    padding-bottom: 10px;
     color: var(--primary-color);
     font-size: 0.875rem;
     text-decoration: none;
@@ -360,11 +428,216 @@ main {
     text-decoration: underline;
 }
 
+/*Registration*/
+.regis-page-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin:50px;
+    min-height: 84vh;
+}
 
+.regis-card {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 1.2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    width: 700px;
+    margin: 0 auto;
+}
+@media (max-width: 900px) {
+    .regis-card{
+        padding: 30px 30px;
+        width: 400px;
+    }
+    .regis-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .regis-form-grid::before { display: none; }
+}
+
+.regis-card h2 {
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.7rem;
+}
+
+.input-group input {
+    width: 100%;
+    margin-top: 1rem;
+    padding-bottom: 0.5rem;
+    border: none;
+    border-bottom: 2px solid var(--light-bg);
+    outline: none;
+    font-family: var(--font-thai);
+    font-size: 1.2rem;
+    background: transparent;
+    transition: border-bottom-color 0.3s;
+}
+
+.input-group label {
+    position: absolute;
+    top: 1rem;
+    bottom: 1 rem;
+    left: 0.5rem;
+    font-size: 1.2rem;
+    color: #999;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+#password {
+    /* ปรับค่านี้ให้มากกว่า 40px หากไอคอนใหญ่ */
+    padding-right: 40px; 
+    /* ... rest of your existing input styles ... */
+}
+
+.password-toggle-btn {
+    position: absolute;
+    /* จัดตำแหน่งให้อยู่ด้านขวาและกึ่งกลางแนวตั้ง */
+    top: 50%; 
+    right: 15px; /* ปรับระยะห่างจากขอบขวา */
+    transform: translateY(-50%); /* ดึงกลับขึ้นมาครึ่งหนึ่งเพื่อจัดกึ่งกลาง */
+    
+    /* สไตล์ปุ่ม */
+    background: transparent; /* ใส่เป็นโปร่งใสเพื่อให้ดูเหมือนเป็นส่วนของ input */
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem; /* เล็กลงให้ชิด input */
+    color: #666; /* สีไอคอน */
+    font-size: 1.25rem; /* ขนาดไอคอน */
+    z-index: 20; /* ให้ปุ่มอยู่เหนือ input field */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.password-toggle-btn:hover {
+    color: var(--link-hover-color);
+}
+
+.password-toggle-btn:focus {
+    outline: none;
+}
+
+/* size the inline SVG used for the password toggle */
+.password-toggle-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: block;
+}
+
+/* Ensure the slash line inherits currentColor */
+.password-toggle-btn svg line {
+    stroke: currentColor;
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+    top: -0.5rem;
+    left: 0.5rem;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.input-group input:focus {
+    border-bottom-color: var(--focus-border);
+}
+
+.form-check{
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 15px;
+    padding-left: 8px;
+    font-size: 1rem;
+}
+
+.regis-btn {
+    background-color: var(--primary-color);
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-thai);
+    font-size: 1.2rem;
+    font-weight: 300;
+    letter-spacing: 0.7px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    border: none;
+    box-shadow: 0 4px 10px rgba(33, 138, 10, 0.4);
+}
+
+.regis-btn:hover {
+    background-color: #1a6f08;
+}
+
+.link-footer {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.link-footer:hover {
+    text-decoration: underline;
+}
+/*User Dashboard*/
+.user-dashboard{
+    font-weight: 300;
+    font-size: 20px;
+    padding-top: 30px;
+    color: white;
+    text-align: left;
+    
+}
+.user-dashboard h1{
+    font-size: 35px;
+    padding: 0px 10px 10px 0px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
+}
+
+.user-dashboard .info-flex{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.user-dashboard .info{
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    color: var(--secondary-color);
+    text-align: left;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    background: linear-gradient(to right, var(--primary-color), var(--link-hover-color));
+} 
+
+.user-dashboard .title{
+    color: #022e08;
+    font-weight: 400;
+    font-size: 23.5px;
+    
+}
 /*Branches*/
 .branches-container{
+    font-weight: 300;
     color: white;
-    padding: 40px 20px;
+    padding: 30px 20px;
     text-align: center;
 }
 
@@ -378,7 +651,8 @@ main {
 /*Menu*/
 .menu-container {
     color: white;
-    padding: 40px 20px;
+    font-weight: 300;
+    padding: 30px 20px;
     text-align: center;
     
 }

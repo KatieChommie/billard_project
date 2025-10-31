@@ -30,3 +30,29 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.getElementById('togglePassword');
+        const toggleIcon = document.getElementById('toggleIcon'); // อ้างอิงถึง i tag โดยตรง
+
+        // Guard: only attach if all elements exist (prevents errors on pages without the login form)
+        if (passwordInput && toggleButton && toggleIcon) {
+            // find the slash element inside the inline SVG (we toggle its visibility)
+            const iconSlash = toggleIcon.querySelector('#iconSlash');
+
+            toggleButton.addEventListener('click', function () {
+                // สลับประเภทของ input
+                const isPassword = passwordInput.getAttribute('type') === 'password';
+                passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+
+                // Toggle the slash visibility: when showing text (isPassword true -> now text), hide the slash
+                if (iconSlash) {
+                    iconSlash.style.display = isPassword ? 'none' : 'inline';
+                }
+
+                // Update accessible state
+                toggleButton.setAttribute('aria-pressed', (!isPassword).toString());
+            });
+        }
+    });

@@ -43,7 +43,7 @@
                             <a href="{{ route('login') }}" class="nav__button">เข้าสู่ระบบ</a>
                         @endguest
                         @auth
-                            <a href="{{ route('points.points') }}" class="nav__button nav__button--user">{{ Auth::user()->username }}</a>
+                            <a href="{{ route('user.dashboard') }}" class="nav__button nav__button--user">User: {{ Auth::user()->username }}</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;"> @csrf </form>
                             <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav__button nav__button--logout">ออกจากระบบ</a>
                         @endauth

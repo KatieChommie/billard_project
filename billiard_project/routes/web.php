@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController; // Breeze uses this
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController\DashboardController;
 // Make sure to import controllers you use
 // use App\Http\Controllers\BookingController;
 // use App\Http\Controllers\OrderController;
@@ -29,15 +30,26 @@ Route::get('/carts/cart', [SiteController::class, 'cart'])->name('carts.cart');
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
 // --- Breeze Default Routes (Keep These) ---
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard'); // User dashboard
+Route::get('/user/dashboard', function () {
+    return view('user.dashboard');
+})->middleware(['auth', 'verified'])->name('user.dashboard'); // User dashboard
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::middleware(['auth'])->group(function () {
+    // กำหนด Route ให้ชี้ไปยัง Controller ใหม่
+    Route::get('/my-account', [DashboardController::class, 'index'])->name('user.dashboard'); 
+    
+    // ... routes อื่นๆ ...
+});
+
+Route::delete('/profile', [ProfileController::class, 'destroy'])
+    ->middleware(['auth', 'password.confirm']) // ใช้ middleware เพื่อยืนยันรหัสผ่านอีกครั้ง
+    ->name('profile.destroy');
 
 // --- Authentication Routes (Handled by Breeze) ---
 require __DIR__.'/auth.php'; // This line is crucial
