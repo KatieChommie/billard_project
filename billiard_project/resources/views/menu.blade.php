@@ -3,58 +3,51 @@
 @section('content')
 
 <section class='menu-container'>
-    <h2>เมนูอาหารและเครื่องดื่ม</h2>
-    <div class='menu-grid'>
-        <!--Menus-->
-        <div class='menu-item'>
-            <img src= {{ asset('images\a_plate_of_ff.webp') }} alt='เฟรนช์ฟรายส์'>
-            <h3>เฟรนช์ฟรายส์ (French Fries)</h3>
-            <p class='description'></p>
-            <p class='price'>฿ 69</p>
-            <button class='add-to-cart-btn'>สั่งเลย</button>
-        </div>
+    <h1>เมนูอาหาร ของว่าง และเครื่องดื่ม</h1>
 
-        <div class='menu-item'>
-            <img src={{ asset('images\a_can_of_coke.webp') }} alt='โค้ก'>
-            <h3>โค้ก (Coke)</h3>
-            <p class='description'>เครื่องดื่มเย็นชื่นใจ เหมาะกับเกมบิลเลียด</p>
-            <p class='price'>฿ 30</p>
-            <button class='add-to-cart-btn'>สั่งเลย</button>
-        </div>
+    <div class="branch-selector">
+        <label for="branch-select">เลือกสาขา:</label>
+        <select id="branch-select" onchange="window.location.href='/menu/' + this.value">
+            @foreach ($branches as $branch)
+                <option value="{{ $branch->branch_id }}" 
+                    {{ $branch->branch_id == $selectedBranchId ? 'selected' : '' }}>
+                    {{ $branch->branch_name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-        <div class='menu-item'>
-            <img src={{ asset('images\IMG_9476.jpeg') }} alt='โค้ก'>
-            <h3>โกโก้</h3>
-            <p class='description'>แมวมือสอง</p>
-            <p class='price'>฿ 999</p>
-            <button class='add-to-cart-btn'>สั่งเลย</button>
-        </div>
+    <nav class="category-tabs">
+        <ul class="tab-list">
+            <li class="tab-item active" data-filter="All">ทั้งหมด</li>
+            <li class="tab-item" data-filter="Meal">อาหารจานหลัก</li>
+            <li class="tab-item" data-filter="Snack">ของว่าง</li>
+            <li class="tab-item" data-filter="Drink">เครื่องดื่ม</li>
+        </ul>
+    </nav>
 
-        <div class='menu-item'>
-            <img src={{ asset('images\IMG_9476.jpeg') }} alt='โค้ก'>
-            <h3>โกโก้</h3>
-            <p class='description'>แมวมือสอง</p>
-            <p class='price'>฿ 999</p>
-            <button class='add-to-cart-btn'>สั่งเลย</button>
+    @foreach ($groupedMenu as $type => $menuItems)
+        
+        <div class='menu-grid' data-category="{{ ucfirst($type) }}"> 
+        
+        {{-- วนลูปตามรายการสินค้าในแต่ละประเภท --}}
+        @foreach ($menuItems as $item)
+            <div class='menu-item' data-menu-id="{{ $item->menu_id }}">
+                <img src="{{ asset('images/' . $item->image_path) }}" alt="{{ $item->menu_name }}">
+                <span class='tag'>{{ ucfirst($item->menu_type) }}</span> 
+                <h3>{{ $item->menu_name }}</h3>
+                <p class='description'></p>
+                <p class='price'>{{ $item->price }}฿</p>
+                
+                {{-- โค้ดที่แก้ไข: แสดงปุ่ม "สั่งเลย" โดยไม่ต้องเช็คสต็อก --}}
+                <button class='add-to-cart-btn'>สั่งเลย</button>
+            </div>
+        @endforeach
+        
         </div>
+        
+    @endforeach {{-- สิ้นสุด loop ประเภทสินค้า --}}
 
-        <div class='menu-item'>
-            <img src={{ asset('images\IMG_9476.jpeg') }} alt='โค้ก'>
-            <h3>โกโก้</h3>
-            <p class='description'>แมวมือสอง</p>
-            <p class='price'>฿ 999</p>
-            <button class='add-to-cart-btn'>สั่งเลย</button>
-        </div>
-
-        <div class='menu-item'>
-            <img src={{ asset('images\IMG_9476.jpeg') }} alt='โค้ก'>
-            <h3>โกโก้</h3>
-            <p class='description'>แมวมือสอง</p>
-            <p class='price'>฿ 999</p>
-            <button class='add-to-cart-btn'>สั่งเลย</button>
-        </div>
-
-        </div>
 </section>
 
 @endsection

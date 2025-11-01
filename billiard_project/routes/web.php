@@ -18,7 +18,7 @@ use App\Http\Controllers\UserController\DashboardController;
 
 // --- Your Custom Site Routes ---
 Route::get('/', [SiteController::class, 'index'])->name('home');
-Route::get('/menu', [SiteController::class, 'menu'])->name('menu');
+Route::get('/menu/{branchId?}', [SiteController::class, 'menu'])->name('menu');
 Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
 Route::get('/booking/branches', [SiteController::class, 'branches'])->name('booking.branches');
 Route::get('/booking/reservation', [SiteController::class, 'reservation'])->name('booking.reservation'); // Your chosen name

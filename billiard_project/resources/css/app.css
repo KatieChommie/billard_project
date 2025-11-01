@@ -21,6 +21,10 @@ body{
     font-family: var(--font-thai);
     color: var(--text-color);
     
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    
     background-image: url("/public/images/billiardbg.jpg");
     background-attachment: fixed;
     background-position: center;
@@ -166,9 +170,18 @@ body{
 main {
     padding-top: var(--header-height); /* ชดเชยความสูงของ Navbar ที่เป็น fixed */
     min-height: calc(100vh - 4rem); /* ความสูงขั้นต่ำ */
+    flex-grow: 1;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
     
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0; /* เพิ่ม Padding ด้านบนและล่าง 20px */
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 /*Index-หน้าแรก*/
@@ -179,6 +192,7 @@ main {
     color: white;
     text-align: center;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
+    
 }
 
 .hero-section h1{
@@ -281,8 +295,8 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin:50px;
-    min-height: 84vh;;
+    margin: 0px 50px;
+    min-height: calc(100vh - var(--header-height) - 62px);
 }
 
 .login-card {
@@ -291,7 +305,7 @@ main {
     border-radius: 1.2rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     max-width: 420px;
-    width: 500px;
+    width: 100๔;
 }
 
 .login-card h2 {
@@ -301,9 +315,20 @@ main {
     text-align: center;
 }
 
+@media (max-width: 900px) {
+    .login-page-container{
+        min-height: calc(100vh - var(--header-height) - 100px);
+        margin: 20px -20px;
+    }
+    .login-card{
+        padding: 20px 20px;
+        max-width: 450px;
+    }
+}
+
 .input-group {
     position: relative;
-    margin-bottom: 1.7rem;
+    margin-bottom: 5px;
 }
 
 .input-group input {
@@ -390,7 +415,7 @@ main {
 
 .form-check{
     padding-top: 5px;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
 }
 
 .login-btn {
@@ -433,39 +458,51 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin:50px;
-    min-height: 84vh;
+    margin: 0px 50px;
+    min-height: calc(100vh - var(--header-height) - 62px);
+    padding: 0 20px;
 }
 
 .regis-card {
     background-color: white;
-    padding: 30px 40px;
+    padding: 20px 40px;
     border-radius: 1.2rem;
     box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    width: 700px;
+    /* **ปรับความกว้างให้รองรับ 2 คอลัมน์ (จาก 700px) ** */
+    max-width: 900px; 
+    width: 100%; /* ใช้เปอร์เซ็นต์ร่วมด้วย */
     margin: 0 auto;
 }
+
+.regis-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px 30px; /* ระยะห่างระหว่างแถวและคอลัมน์ */
+}
 @media (max-width: 900px) {
+    .regis-page-container{
+        margin: 20px -20px;
+    }
     .regis-card{
-        padding: 30px 30px;
-        width: 400px;
+        padding: 20px 20px;
+        max-width: 450px;
     }
     .regis-form-grid {
         grid-template-columns: 1fr;
+        gap: 0; 
     }
-    .regis-form-grid::before { display: none; }
 }
 
 .regis-card h2 {
     font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 2rem;
+    margin-bottom: 1.2rem;
     text-align: center;
 }
 
 .input-group {
     position: relative;
-    margin-bottom: 1.7rem;
+    margin-bottom: 5px;
 }
 
 .input-group input {
@@ -594,45 +631,219 @@ main {
 .link-footer:hover {
     text-decoration: underline;
 }
+
+.back-link {
+    /* ทำให้ปุ่มลอยอยู่มุมซ้ายบนของ Card */
+    position: absolute; 
+    top: 20px;
+    left: 20px;
+    
+    /* สไตล์ปุ่ม */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; 
+    height: 40px; 
+    color: #333; /* สีของไอคอน */
+    text-decoration: none; /* ลบเส้นใต้ลิงก์ */
+    border-radius: 50%; /* ทำให้เป็นวงกลม */
+    transition: background-color 0.2s;
+    z-index: 10; /* ให้ปุ่มอยู่เหนือองค์ประกอบอื่น */
+}
+
+.back-link:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* สีพื้นหลังเมื่อวางเมาส์ */
+}
+
+.back-icon {
+    /* ขนาดไอคอน */
+    width: 24px;
+    height: 24px;
+}
+
+/* ตั้งค่าให้ Card เป็น Relative เพื่อให้ปุ่ม Back ถูกจัดวางได้อย่างถูกต้อง */
+/* ในกรณีนี้คือ .login-card และ .regis-card */
+.login-card, .regis-card {
+    position: relative; 
+    /* ... สไตล์เดิมของ Card ... */
+    padding-top: 50px; /* เพิ่มพื้นที่ด้านบนสำหรับปุ่ม */
+}
+
+/* ปรับตำแหน่ง Title ไม่ให้ชนปุ่ม */
+.login-card-title, .regis-card-title {
+    margin-top: 10px; /* หรือปรับค่า margin-top ให้เหมาะสม */
+}
+
 /*User Dashboard*/
 .user-dashboard{
-    font-weight: 300;
-    font-size: 20px;
-    padding-top: 30px;
-    color: white;
-    text-align: left;
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1000px;
+    margin: 25px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .user-dashboard h1{
-    font-size: 35px;
-    padding: 0px 10px 10px 0px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
 }
 
-.user-dashboard .info-flex{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 30px;
-    margin-top: 30px;
+.user-dashboard h2{
+    color: #495057;
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.user-dashboard .info{
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 10px;
-    color: var(--secondary-color);
+section {
+    padding: 20px 0;
+}
+
+/* --- User Info Section --- */
+.user-info-section p {
+    margin: 8px 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.highlight-points {
+    font-weight: bold;
+    color: #28a745; /* สีเขียวสำหรับแต้มสะสม */
+    font-size: 1.1em;
+}
+
+/* --- Booking History Section (Table) --- */
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px 15px;
     text-align: left;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    background: linear-gradient(to right, var(--primary-color), var(--link-hover-color));
-} 
-
-.user-dashboard .title{
-    color: #022e08;
-    font-weight: 400;
-    font-size: 23.5px;
-    
+    border-bottom: none;
+    vertical-align: middle;
 }
+
+tr {
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+td.status-completed,
+td.status-upcoming,
+td.status-cancelled {
+    /* นำ display: flex และ align-items: center ออก เพื่อใช้ text-align และ vertical-align 
+       ซึ่งทำงานได้เสถียรกว่าในตาราง */
+    text-align: center; 
+    /* vertical-align: middle; ถูกกำหนดไว้แล้วที่ td ทั่วไป */
+}
+
+th {
+    background-color: #fff; /* หัวตารางเป็นสีขาวตามภาพ */
+    color: #343a40;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* หากต้องการให้ 'ยอดชำระ' ชิดขวาเหมือนในรูป ให้เพิ่มคลาส align-right ใน HTML
+   <td class="align-right">1,200 บาท</td> */
+.align-right {
+    text-align: right !important; 
+}
+
+/* Status Badges */
+.status-completed,
+.status-upcoming,
+.status-cancelled {
+    font-weight: bold;
+    font-size: 1.05em; /* ทำให้ตัวอักษรใหญ่ขึ้นเล็กน้อย */
+    margin:0.2rem 0.2rem 0.2rem 15px;
+    /* ***** การปรับขนาดและรูปร่างให้ตรงกับภาพ ***** */
+    padding: 8px 15px; /* เพิ่ม padding ให้ใหญ่และยาวขึ้น */
+    border-radius: 4px; /* ความโค้งมนน้อย */
+    display: inline-block;
+    /* ********************************************* */
+}
+
+.status-completed {
+    color: white;
+    background-color: #4CAF50; /* สีเขียวที่เข้มและสดใสขึ้น */
+}
+
+.status-upcoming {
+    color: #333; /* ข้อความสีเข้ม */
+    background-color: #FFC107; /* สีเหลืองทอง */
+}
+
+.status-cancelled {
+    color: white;
+    background-color: #DC3545; /* สีแดง */
+}
+
+
+/* --- Review History Section --- */
+.review-item {
+    border: 1px solid #e9ecef;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    background-color: #fcfcfc;
+}
+
+.review-meta {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #007bff;
+}
+
+.review-text {
+    font-style: italic;
+    color: #555;
+    margin: 5px 0 10px 0;
+    border-left: 3px solid #ced4da;
+    padding-left: 10px;
+}
+
+.review-date {
+    font-size: 0.85em;
+    text-align: right;
+    color: #6c757d;
+}
+
+/* --- Responsive Design (Optional but Recommended) --- */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 20px 15px;
+    }
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /*Branches*/
 .branches-container{
     font-weight: 300;
@@ -641,49 +852,282 @@ main {
     text-align: center;
 }
 
-.branches-container .branch-grid{
+.branches-container h1{
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.branches-container .branches-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 30px;
     margin-top: 30px;
 }
+
+.branches-container .list-of-branches {
+    padding-bottom: 70px;
+    border-radius: 8px;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    background-image: linear-gradient(to right, #FFFFFF, #ECE9E6);
+}
+
+.branches-container .list-of-branches:hover {
+    box-shadow: 0px 0px 20px 1px #8df166ce;
+    border: 2px solid var(--link-hover-color);
+}
+.branches-container .list-of-branches img {
+    max-width: 100%;
+    height: 78.5%;
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+}
+
+.branches-container .list-of-branches .Info {
+    color: black;
+    text-align: center;
+    margin: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 
 /*Menu*/
 .menu-container {
-    color: white;
+    color: var(--text-color);
     font-weight: 300;
     padding: 30px 20px;
     text-align: center;
-    
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.menu-container h1 {
+    color: white; /* หัวข้อหลักยังคงเป็นสีขาว */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+}
+
+/* CONTAINER/WRAPPER สำหรับ Dropdown */
+.branch-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* LABEL ของ Dropdown */
+.branch-selector label {
+    color: white; /* สีข้อความให้เข้ากับพื้นหลังเข้ม */
+    font-weight: 500;
+    margin-right: 15px;
+    font-size: 1.1rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* DROP DOWN LIST หลัก (#branch-select) */
+#branch-select {
+    /* รีเซ็ตลักษณะเริ่มต้นของเบราว์เซอร์ */
+    -webkit-appearance: none;  /*สำหรับ Chrome/Safari */
+
+
+    /* สไตล์หลัก */
+    background-color: white;
+    color: var(--text-color);
+    padding: 10px 40px 10px 20px; /* เพิ่ม padding ขวาสำหรับไอคอนลูกศร */
+    border-radius: 8px;
+    font-family: var(--font-thai);
+    font-size: 1rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#branch-select:hover {
+    border-color: var(--link-hover-color);
+    box-shadow: 0 0 10px rgba(33, 138, 10, 0.4);
+}
+
+.branch-selector {
+    /* ทำให้ Dropdown ถูกหุ้มด้วย position: relative */
+    position: relative;
+}
+
+.branch-selector::after {
+    /* เพิ่มไอคอนลูกศรลงไปใน Dropdown List */
+    content: '▼'; 
+    position: absolute;
+    right: calc(50% - 135px); /* ปรับตำแหน่งให้เหมาะสม */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    pointer-events: none; /* ให้คลิกผ่านไปที่ select ได้ */
+}
+
+/* categories */
+
+.category-tabs {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto 30px; /* จัดกึ่งกลางและเพิ่มระยะห่าง */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tab-list {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    padding: 0 10px;
+}
+
+.tab-item {
+    padding: 15px 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #6c757d; /* สีข้อความปกติ */
+    transition: color 0.2s, border-bottom 0.3s;
+    position: relative; /* ใช้สำหรับขีดเส้นใต้ */
+}
+
+.tab-item:hover {
+    color: var(--link-hover-color);
+}
+
+.tab-item.active {
+    color: var(--primary-color); /* สีข้อความเมื่อ Active */
+    font-weight: 600;
+}
+
+.tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%; /* ความกว้างของขีดเส้นใต้ */
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+
+.menu-item.hidden {
+    display: none;
+}
+
+/* 🚩 ส่วนเพิ่มเติม: สไตล์สำหรับหัวข้อหมวดหมู่ (ต้องเพิ่มใน HTML) */
+.menu-category-header {
+    text-align: left;
+    color: white; /* หัวข้อหมวดหมู่ย่อยเป็นสีขาวให้ตัดกับพื้นหลัง */
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-top: 45px;
+    margin-bottom: 20px;
+    padding-left: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .menu-container .menu-grid {
+    /* ใช้สำหรับจัดโครงสร้างหลักของไอเทมทั้งหมด */
     display: grid;
-    /* ใช้ Grid เพื่อจัดวางเมนูเป็นตาราง */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
 .menu-container .menu-item {
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 8px;
+    padding-bottom: 15px; /* ลด padding ด้านล่าง */
+    border-radius: 12px; /* มุมโค้งมนมากขึ้น */
+    height: 100%; /* ทำให้ความสูงของทุกกล่องเท่ากัน */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background-color: white; /* เปลี่ยนเป็นสีขาวล้วนเพื่อความสะอาด */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-container .menu-item:hover {
+    transform: translateY(-5px); /* เพิ่มเอฟเฟกต์ยกขึ้นเมื่อชี้ */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
 
 .menu-container .menu-item img {
-    width: 250px;
-    height: auto;
-    object-fit: cover;
+    width: 100%;
+    height: 300px; /* กำหนดความสูงภาพคงที่ */
+    object-fit: cover; /* ครอบคลุมพื้นที่โดยไม่ยืดภาพ */
+    border-top-right-radius: 12px;
+    border-top-left-radius: 12px;
+}
+
+.menu-container h3 {
+    color: var(--text-color);
+    padding: 10px 10px 5px;
+    font-size: 1.2rem;
+    min-height: 50px; /* เว้นที่สำหรับชื่อยาวหลายบรรทัด */
+}
+
+.menu-container .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 5px 0 5px;
     border-radius: 4px;
-    margin-bottom: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    background-color: var(--primary-color); /* ใช้สีหลักของเว็บไซต์ */
 }
 
 .menu-container .price {
-    font-size: 1.5em;
-    color: #cc0000; /* สีแดงสำหรับราคา */
+    font-size: 1.8em;
+    color: #cc0000;
     font-weight: bold;
+    margin: 10px 0;
 }
 
+.menu-container .add-to-cart-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.menu-container .add-to-cart-btn:hover {
+    background-color: var(--link-hover-color);
+}
+
+/*Reviews*/
+.review-container{
+    color: var(--secondary-color);
+}
+.review-container h1, h2{
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.review-submit-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    border: none;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.review-submit-button:hover {
+    background-color: var(--link-hover-color);
+}

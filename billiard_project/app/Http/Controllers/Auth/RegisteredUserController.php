@@ -29,17 +29,22 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $min_date = now()->subYears(15)->format('Y-m-d'); 
+        $max_date = now()->subYears(100)->format('Y-m-d');
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:30', 'unique:'.User::class], // ตรวจสอบ username
+            'last_name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:30', 'unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone_number' => ['required', 'string', 'max:10'], // ตรวจสอบเบอร์โทร
-            'date_of_birth' => ['required', 'date'], // ตรวจสอบวันเกิด
+            'phone_number' => ['required', 'string', 'regex:/^0[689]\d{8}$/'],
+            'date_of_birth' => ['required', 'date', 'before_or_equal:' . $min_date, 'after_or_equal:' . $max_date],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'last_name' => $request->last_name,
             'username' => $request->username, // <-- ส่งค่า Username
             'email' => $request->email,
             'phone_number' => $request->phone_number, // <-- ส่งค่าเบอร์โทร

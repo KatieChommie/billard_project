@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash; // Import Hash facade for password hashing
@@ -17,9 +16,11 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             // **แก้ไขให้ตรงกับคอลัมน์ในฐานข้อมูลจริงของคุณ:**
-            'name' => 'Test User One', 
+            'name' => 'Chompoo',
+            'last_name' => 'Panyanarupol',
             'email' => 'test1@example.com', 
-            'password' => Hash::make('password'), 
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(), // เพิ่มให้ครบถ้วน 
             
             // คอลัมน์อื่น ๆ ที่มีอยู่ในตารางจริง
             'username' => 'KatieChommie', 

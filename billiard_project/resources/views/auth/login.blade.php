@@ -4,6 +4,14 @@
 @section('content')
 <div class="login-page-container">
     <div class="login-card">
+
+        <a href="{{ route('home') }}" class="back-link" aria-label="ย้อนกลับ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        </a>
+        
         <h2 class="login-card-title">เข้าสู่ระบบ Let's Billiard</h2>
         
         <form method="POST" action="{{ route('login') }}" autocomplete="off">
@@ -11,7 +19,7 @@
 
             {{-- ** แสดงข้อผิดพลาด Validation ** --}}
             @if ($errors->any())
-                <div class="error-message mb-4">
+                <div class="error-message">
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
