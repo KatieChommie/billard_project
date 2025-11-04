@@ -1001,6 +1001,17 @@ tr:hover {
     background-color: #DC3545;
 }
 
+.table-btn.booked {
+    background-color: #E2E8F0; /* สีเทา */
+    color: #A0AEC0; /* สีตัวอักษรเทา */
+    cursor: not-allowed;
+    border: 2px solid #CBD5E0;
+    opacity: 0.7; /* ทำให้จางลงเล็กน้อย */
+}
+
+.table-btn.booked img {
+    opacity: 0.5; /* ทำให้ไอคอนจางลง */
+}
 
 /* --- Review History Section --- */
 .review-item {
@@ -1641,6 +1652,149 @@ tr:hover {
 
 .hidden {
     display: none; 
+}
+
+/*Check Out*/
+.checkout-container {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+}
+.checkout-header {
+    margin-bottom: 25px;
+}
+.checkout-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+.subtitle {
+    font-size: 1.1rem;
+    color: #666;
+}
+.summary-box {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+.summary-item.total {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #E53E3E; /* (สีแดง) */
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+}
+.reward-box {
+    background-color: #fffaf0; /* (สีเหลืองอ่อน) */
+    border: 1px dashed #F6E05E; /* (สีเหลือง) */
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+.reward-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+.reward-form {
+    display: flex;
+    gap: 10px;
+}
+.reward-form select {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.reward-apply-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #F6E05E; /* (สีเหลือง) */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.applied-reward {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #4CAF50; /* (สีเขียว) */
+}
+    
+/* (แก้ไข) สรุปยอด */
+.summary-item.discount {
+    color: #E53E3E; /* (สีแดง) */
+}
+.summary-item.final-total {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2D3748; 
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+}
+.summary-item.total {
+    font-size: 1.1rem;
+    font-weight: normal;
+    color: #666;
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+.qr-code-box {
+    margin-bottom: 25px;
+}
+.qr-code-box img {
+    width: 250px;
+    height: 250px;
+    display: block;
+    margin: 0 auto;
+    border: 5px solid #eee;
+}
+.payment-form {
+    margin-top: 20px;
+}
+.confirm-payment-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+}
+.confirm-payment-btn:hover {
+    background-color: #45a049;
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    padding: .75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
 }
 
 /*Reviews*/

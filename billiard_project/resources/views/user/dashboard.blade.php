@@ -25,39 +25,88 @@
 
         <section class="booking-history-section">
             <h2>2. ประวัติการจอง</h2>
-            <div class="table-responsive">
+
+            {{-- (เพิ่ม) แสดง Error/Success Messages --}}
+            @if ($errors->any())
+            <div class="alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+            @endif
+            @if (session('success'))
+                <div class="alert-success" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                {{ session('success') }}
+                </div>
+            @endif
+            {{-- (สิ้นสุดส่วน Alert) --}}
+
+
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>รหัสการจอง</th>
+                            <th>รหัสจอง</th>
                             <th>บริการ</th>
-                            <th>วันที่/เวลา</th>
+                            <th>วัน-เวลา</th>
                             <th>สถานะ</th>
                             <th>ยอดชำระ</th>
+                            <th>จัดการ</th> {{-- (เพิ่มคอลัมน์ Action) --}}
                         </tr>
                     </thead>
                     <tbody>
+                
+                        @forelse ($bookings as $booking)
                         <tr>
-                            <td>BKG-1234</td>
-                            <td>xxx</td>
-                            <td>25/10/2025 - 14:00</td>
-                            <td class="status-completed">เสร็จสิ้น</td>
-                            <td>xxx บาท</td>
+                            <td>#{{ $booking->order_id }}</td>
+                            <td>จองโต๊ะ</td> {{-- (ข้อมูลบริการ) --}}
+                            <td>
+                                {{ \Carbon\Carbon::parse($booking->start_time)->format('d/m/Y - H:i') }}
+                            </td>
+
+                            {{-- (Logic) แปลง status เป็น Class CSS ของคุณ --}}
+                            @php
+                                $statusClass = '';
+                                $statusText = '';
+                                if ($booking->order_status == 'confirmed') {
+                                    $statusClass = 'status-completed'; // (ตรงกับ CSS Mock ของคุณ)
+                                    $statusText = 'เสร็จสิ้น';
+                                } elseif ($booking->order_status == 'pending') {
+                                    $statusClass = 'status-upcoming'; // (ตรงกับ CSS Mock ของคุณ)
+                                    $statusText = 'รอชำระเงิน/ยืนยัน';
+                                } elseif ($booking->order_status == 'cancelled') {
+                                    $statusClass = 'status-cancelled'; // (ตรงกับ CSS Mock ของคุณ)
+                                    $statusText = 'ยกเลิก';
+                                }
+                            @endphp
+                            <td class="{{ $statusClass }}">{{ $statusText }}</td>
+
+                            <td>{{ number_format($booking->final_amount, 2) }} บาท</td>
+                            <td>
+                                {{-- (สำคัญ) แสดงปุ่มเฉพาะ Order ที่ 'pending' เท่านั้น --}}
+                                @if ($booking->order_status == 'pending')
+                                    <form action="{{ route('dashboard.booking.cancel') }}" method="POST" 
+                                        onsubmit="return confirm('คุณต้องการยกเลิกการจองนี้ใช่หรือไม่?');">
+                                        @csrf
+                                        <input type="hidden" name="order_id" value="{{ $booking->order_id }}">
+                                    
+                                        {{-- (คุณต้องเพิ่ม Style ให้ปุ่มนี้เอง) --}}
+                                        <button type="submit" class="cancel-btn-custom" 
+                                                style="background-color: #E53E3E; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer;">
+                                            ยกเลิก
+                                        </button>
+                                    </form>
+                                @else
+                                -
+                                @endif
+                            </td>
                         </tr>
+                    @empty
                         <tr>
-                            <td>xx</td>
-                            <td>xxx</td>
-                            <td>05/11/2025 - 10:00</td>
-                            <td class="status-upcoming">กำลังจะมาถึง</td>
-                            <td>xx บาท</td>
+                            <td colspan="6" style="text-align: center;">ไม่พบประวัติการจอง</td>
                         </tr>
-                        <tr>
-                            <td>BKG-9012</td>
-                            <td>สปาเท้า</td>
-                            <td>15/09/2025 - 11:30</td>
-                            <td class="status-cancelled">ยกเลิก</td>
-                            <td>800 บาท</td>
-                        </tr>
+                    @endforelse
+
                     </tbody>
                 </table>
             </div>

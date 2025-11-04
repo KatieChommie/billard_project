@@ -25,7 +25,17 @@ Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
 Route::get('/booking/branches', [SiteController::class, 'branches'])->name('booking.branches');
 Route::get('/booking/table/{branchId}', [ReservationController::class, 'showBookingForm'])->name('booking.table');
 Route::post('/booking/check', [ReservationController::class, 'checkTableAvailability'])->name('reservation.check');
-Route::post('/reservation/confirm', [ReservationController::class, 'reserveTable'])->name('reservation.confirm');
+Route::post('/reservation/confirm', [ReservationController::class, 'reserveBooking'])->name('reservation.confirm');
+
+Route::get('/checkout/{order_id?}', [ReservationController::class, 'showCheckoutPage'])
+     ->middleware(['auth'])
+     ->name('checkout.page');
+Route::post('/checkout/apply-reward', [ReservationController::class, 'applyReward'])
+     ->middleware(['auth'])
+     ->name('checkout.apply_reward');
+Route::post('/checkout/process', [ReservationController::class, 'processPayment'])
+     ->middleware(['auth'])
+     ->name('checkout.process');
 
 Route::get('/orders/order', [SiteController::class, 'order'])->name('orders.order');
 Route::get('/points', [SiteController::class, 'pointsPage'])->name('points.index');
@@ -34,33 +44,32 @@ Route::post('/points/redeem', [SiteController::class, 'redeemPoints'])->name('po
 Route::post('/points/checkin', [SiteController::class, 'dailyCheckin'])->name('points.checkin');
 Route::get('/carts/cart', [SiteController::class, 'cart'])->name('carts.cart');
 
-// --- Breeze Default Routes (Keep These) ---
-Route::get('/user/dashboard', function () {
-    return view('user.dashboard');
-})->middleware(['auth', 'verified'])->name('user.dashboard'); // User dashboard
 
+/* DASHBOARDS */
 Route::middleware('auth')->group(function () {
+    Route::get('/user/dashboard', [DashboardController::class, 'index'])
+         ->middleware(['verified']) 
+         ->name('user.dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::middleware(['auth', 'admin'])->group(function () {
-
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-    // อนาคตจะ "จัดการเมนู" "จัดการสาขา" ก็ยัดไว้ในนี้
-    // Route::get('/admin/menus', [AdminController::class, 'manageMenus']);
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/my-account', [DashboardController::class, 'index'])->name('user.dashboard'); 
-    
+    Route::post('/dashboard/cancel-booking', [DashboardController::class, 'cancelBooking'])
+         ->name('dashboard.booking.cancel');
 });
 
 Route::delete('/profile', [ProfileController::class, 'destroy'])
     ->middleware(['auth', 'password.confirm']) // ใช้ middleware เพื่อยืนยันรหัสผ่านอีกครั้ง
     ->name('profile.destroy');
 
+/* admin */
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+});
+Route::post('/admin/order/complete', [AdminController::class, 'markAsCompleted'])
+     ->middleware(['auth', 'admin']) 
+     ->name('admin.order.complete');
+
+
 // --- Authentication Routes (Handled by Breeze) ---
-require __DIR__.'/auth.php'; // This line is crucial
+require __DIR__.'/auth.php';
