@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class SiteController extends Controller
 {
@@ -33,7 +35,15 @@ class SiteController extends Controller
 
         // 2. ดึงข้อมูลเมนูทั้งหมดสำหรับสาขาที่เลือก (ใช้ $selectedBranchId)
         $rawMenuData = DB::table('menus')
-            ->where('menus.branch_id', $selectedBranchId) // <-- กรองตาม ID ที่รับมา
+            // เลือกคอลัมน์ทั้งหมดจาก menus และเลือก stock_qty จาก inventory
+            ->select('menus.*', 'inventory.stock_qty') 
+            ->where('menus.branch_id', $selectedBranchId)
+        
+            // **JOIN ตาราง inventory**
+            ->leftJoin('inventory', function($join) use ($selectedBranchId) {
+                $join->on('menus.menu_id', '=', 'inventory.menu_id')
+                    ->where('inventory.branch_id', '=', $selectedBranchId);
+            })
             ->get();
 
         // 3. จัดกลุ่มข้อมูลตามประเภท (Meal, Snack, Drink)
@@ -58,16 +68,6 @@ class SiteController extends Controller
         return view('booking.branches', ['branches' => $branches]);
     }
 
-    public function table()
-    {
-
-        return view('booking.table');
-    }
-    public function reservation()
-    {
-
-        return view('booking.reservation');
-    }
 
     //review
     public function reviews()
@@ -84,15 +84,177 @@ class SiteController extends Controller
     }
     
     //points-category
-    public function points()
+    public function pointsPage()
     {
-   
-        return view('points.points'); 
-    }
-    public function point_transact()
-    {
+        $user = Auth::user(); 
+        $currentPoints = $user->loyalty_points;
         
-        return view('points.point_transact'); 
+        // ดึงรายการคูปองที่แลกได้ (ส่วนที่ 3)
+        $redeemableRewards = DB::table('reward')
+            ->where('reward_status', 'active')
+            ->where('reward_type', 'points') 
+            ->where('expired_date', '>', now())
+            ->orderBy('reward_value', 'asc')
+            ->get();
+            
+        return view('points.points', [
+            'currentPoints' => $currentPoints,
+            'rewards' => $redeemableRewards,
+        ]);
+    }
+    public function pointsHistoryPage()
+    {
+        $user = Auth::user(); 
+        $currentPoints = $user->loyalty_points;
+        
+        // 1. ดึงประวัติ "ที่ได้รับ" (Received)
+        $received_transactions = DB::table('reward_transaction')
+            ->where('user_id', $user->user_id)
+            ->where('transact_type', 'received') // <-- กรองเฉพาะที่ได้รับ
+            ->orderBy('transact_date', 'desc') 
+            ->get();
+
+        // 2. ดึงประวัติ "ที่ใช้ไป" (Redeemed)
+        $redeemed_transactions = DB::table('reward_transaction')
+            ->where('user_id', $user->user_id)
+            ->where('transact_type', 'redeemed') // <-- กรองเฉพาะที่ใช้ไป
+            ->orderBy('transact_date', 'desc') 
+            ->get();
+
+        return view('points.point_transact', [
+            'currentPoints' => $currentPoints,
+            'received' => $received_transactions, // <-- ส่งตัวแปรชื่อ received
+            'redeemed' => $redeemed_transactions, // <-- ส่งตัวแปรชื่อ redeemed
+        ]);
+    }
+
+    public function dailyCheckin(Request $request)
+    {
+        // 1. ดึงข้อมูล User ที่ล็อกอินอยู่
+        $user = Auth::user();
+
+        // 2. กำหนดค่าแต้มที่จะเพิ่ม
+        $pointsToAdd = 25;
+        $description = 'เช็คอินรายวัน';
+
+        $today = now()->startOfDay();
+
+        // ค้นหาในประวัติว่า:
+        // 1. ตรงกับ user_id นี้
+        // 2. มี description ตรงกับ 'เช็คอินรายวัน'
+        // 3. มีวันที่ (transact_date) มากกว่าหรือเท่ากับ (>=) เที่ยงคืนของวันนี้
+        $alreadyCheckedIn = DB::table('reward_transaction')
+            ->where('user_id', $user->user_id)
+            ->where('transact_descrpt', $description)
+            ->where('transact_date', '>=', $today)
+            ->exists(); // (exists() คือการถามว่า "มีไหม" - เร็วมาก)
+
+        if ($alreadyCheckedIn) {
+            // ...ให้ออกจากฟังก์ชันทันที และส่ง Error กลับไป
+            return redirect()->route('points.index')->with('error', 'คุณรับแต้มเช็คอินวันนี้ไปแล้ว');
+        }
+
+        try {
+            // ขั้นตอนที่ 1: อัปเดต "กระเป๋าตังค์" (ตาราง users)
+            DB::table('users')
+                ->where('user_id', $user->user_id)
+                ->increment('loyalty_points', $pointsToAdd);
+
+            // ขั้นตอนที่ 2: บันทึก "ประวัติ" (ตาราง reward_transaction)
+            DB::table('reward_transaction')->insert([
+                'user_id' => $user->user_id,
+                'transact_type' => 'received',
+                'pts_change' => $pointsToAdd,
+                'transact_descrpt' => $description,
+                'transact_date' => now(),
+            ]);
+
+            // 3. กลับไปหน้าเดิม พร้อมข้อความ "สำเร็จ"
+            return redirect()->route('points.index')->with('success', 'คุณได้รับ ' . $pointsToAdd . ' แต้ม!');
+
+        } catch (\Exception $e) {
+            // 4. หากเกิดข้อผิดพลาด (เช่น DB ล่ม)
+            return redirect()->route('points.index')->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
+        }
+
+    }
+
+    public function redeemPoints(Request $request)
+    {
+        // 1. ดึงข้อมูลที่จำเป็น
+        $user = Auth::user();
+        $rewardId = $request->input('reward_id'); // ดึง ID คูปองจากฟอร์มที่ซ่อนไว้
+
+        // 2. เริ่มต้น Transaction (สำคัญมาก!)
+        // DB::transaction จะช่วยให้แน่ใจว่าถ้ามีอะไรผิดพลาด
+        // ฐานข้อมูลจะย้อนกลับ (Rollback) ทั้งหมด
+        try {
+            
+            $result = DB::transaction(function () use ($user, $rewardId) {
+
+                // 3. (Validation) ดึงข้อมูลคูปองและ "ล็อค" แถวนี้ไว้
+                // ใช้ sharedLock() เพื่อป้องกันการแลกซ้ำซ้อน
+                $reward = DB::table('reward')
+                    ->where('reward_id', $rewardId)
+                    ->lockForUpdate() // ล็อคแถวนี้เพื่อป้องกันการกดแลกพร้อมกัน
+                    ->first();
+
+                // 4. (Validation) ตรวจสอบเงื่อนไขก่อนแลก
+                if (!$reward) {
+                    return ['success' => false, 'message' => 'ไม่พบคูปองนี้'];
+                }
+
+                if ($reward->reward_status !== 'active') {
+                    return ['success' => false, 'message' => 'คูปองนี้ถูกใช้ไปแล้วหรือหมดอายุ'];
+                }
+
+                // 5. (Validation) ดึงแต้มผู้ใช้ล่าสุด (จำเป็นต้องดึงใหม่ใน transaction)
+                $currentUserPoints = DB::table('users')
+                                    ->where('user_id', $user->user_id)
+                                    ->value('loyalty_points');
+
+                if ($currentUserPoints < $reward->points_required) {
+                    return ['success' => false, 'message' => 'คะแนนสะสมไม่เพียงพอ'];
+                }
+
+
+                // --- ถ้าทุกอย่างผ่าน ---
+
+                // 6. (Action 1) ลดแต้มผู้ใช้
+                DB::table('users')
+                    ->where('user_id', $user->user_id)
+                    ->decrement('loyalty_points', $reward->points_required);
+
+                // 7. (Action 2) เปลี่ยนสถานะคูปองเป็น 'used'
+                DB::table('reward')
+                    ->where('reward_id', $rewardId)
+                    ->update(['reward_status' => 'used']);
+
+                // 8. (Action 3) บันทึกประวัติการใช้แต้ม
+                DB::table('reward_transaction')->insert([
+                    'user_id' => $user->user_id,
+                    'transact_type' => 'redeemed', // ประเภท: แลกแต้ม
+                    'pts_change' => $reward->points_required, // จำนวนแต้มที่เปลี่ยนแปลง [cite: 220]
+                    'transact_descrpt' => 'แลกคูปอง: ' . $reward->reward_descrpt,
+                    'transact_date' => now(),
+                    // 'transact_id' จะถูกสร้างอัตโนมัติ (ถ้าตั้งค่าไว้)
+                ]);
+
+                return ['success' => true, 'message' => 'แลกคูปองสำเร็จ!'];
+
+            }); // สิ้นสุด Transaction
+
+            // 9. Redirect ตามผลลัพธ์
+            if ($result['success']) {
+                return redirect()->route('points.index')->with('success', $result['message']);
+            } else {
+                return redirect()->route('points.index')->with('error', $result['message']);
+            }
+
+        } catch (\Exception $e) {
+            // 10. หากเกิด Error ร้ายแรง (เช่น DB ล่ม)
+            return redirect()->route('points.index')->with('error', 'เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: ' . $e->getMessage());
+        }
     }
 
     //cart

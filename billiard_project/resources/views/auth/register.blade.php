@@ -19,10 +19,10 @@
 
             {{-- ** แสดงข้อผิดพลาด Validation ** --}}
             @if ($errors->any())
-                <div class="error-message mb-4">
+                <div class="alert-message error">
                     <ul>
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li style="list-style:none;">{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -31,8 +31,8 @@
         <div class="regis-form-grid"> 
         
             <div class="input-group">
-                <input type="text" id="name" name="name" placeholder=" " value="{{ old('name') }}" required autofocus autocomplete="off" maxlength="30">
-                <label for="name" class="input-label">ชื่อ</label>
+                <input type="text" id="first_name" name="first_name" placeholder=" " value="{{ old('first_name') }}" required autofocus autocomplete="off" maxlength="30">
+                <label for="first_name" class="input-label">ชื่อ</label>
             </div>
 
             <div class="input-group">

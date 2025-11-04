@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController; // Breeze uses this
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController\DashboardController;
+use App\Http\Controllers\ReservationController;
 // Make sure to import controllers you use
 // use App\Http\Controllers\BookingController;
 // use App\Http\Controllers\OrderController;
@@ -20,14 +21,18 @@ use App\Http\Controllers\UserController\DashboardController;
 Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('/menu/{branchId?}', [SiteController::class, 'menu'])->name('menu');
 Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
+
 Route::get('/booking/branches', [SiteController::class, 'branches'])->name('booking.branches');
-Route::get('/booking/reservation', [SiteController::class, 'reservation'])->name('booking.reservation'); // Your chosen name
-Route::get('/booking/table', [SiteController::class, 'table'])->name('booking.table');
+Route::get('/booking/reservation', [ReservationController::class, 'reservation'])->name('booking.reservation');
+Route::get('/booking/table', [ReservationController::class, 'showBookingForm'])->name('booking.table');
+Route::post('/booking/check', [ReservationController::class, 'checkTableAvailability'])->name('reservation.check');
+Route::post('/reservation/confirm', [ReservationController::class, 'confirmBooking'])->name('reservation.confirm');
 Route::get('/orders/order', [SiteController::class, 'order'])->name('orders.order');
-Route::get('/points/points', [SiteController::class, 'points'])->name('points.points');
-Route::get('/points/point_transact', [SiteController::class, 'point_transact'])->name('points.point_transact');
+Route::get('/points', [SiteController::class, 'pointsPage'])->name('points.index');
+Route::get('/points/history', [SiteController::class, 'pointsHistoryPage'])->name('points.history');
+Route::post('/points/redeem', [SiteController::class, 'redeemPoints'])->name('points.redeem');
+Route::post('/points/checkin', [SiteController::class, 'dailyCheckin'])->name('points.checkin');
 Route::get('/carts/cart', [SiteController::class, 'cart'])->name('carts.cart');
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
 // --- Breeze Default Routes (Keep These) ---
 Route::get('/user/dashboard', function () {
@@ -40,11 +45,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+    // อนาคตจะ "จัดการเมนู" "จัดการสาขา" ก็ยัดไว้ในนี้
+    // Route::get('/admin/menus', [AdminController::class, 'manageMenus']);
+});
+
 Route::middleware(['auth'])->group(function () {
-    // กำหนด Route ให้ชี้ไปยัง Controller ใหม่
     Route::get('/my-account', [DashboardController::class, 'index'])->name('user.dashboard'); 
     
-    // ... routes อื่นๆ ...
 });
 
 Route::delete('/profile', [ProfileController::class, 'destroy'])

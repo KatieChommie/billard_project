@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tables', function (Blueprint $table) {
-            $table->integer('table_id');
-            $table->primary('table_id');
+            $table->unsignedBigInteger('table_id')->primary();
             $table->foreignId('branch_id');
             $table->integer('table_number');
             $table->enum('table_status', ['available', 'reserved', 'unavailable']);

@@ -12,15 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('branches', function (Blueprint $table) {
-            $table->unsignedBigInteger('branch_id');
-            $table->primary('branch_id');
+            $table->id('branch_id')->startingValue(101);
             $table->string('branch_name', 100)->unique();
             $table->string('branch_info', 200)->nullable();
             $table->string('branch_phone', 15)->unique();
             $table->string('branch_address', 200);
-            $table->string('image_path', 255)->nullable();
-            $table->time('time_open')->nullable();
-            $table->time('time_close')->nullable();
+            $table->string('image_path', 255);
+            $table->time('time_open');
+            $table->time('time_close');
         });
     }
 

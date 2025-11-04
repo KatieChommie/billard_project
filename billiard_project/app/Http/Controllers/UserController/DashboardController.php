@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\UserController;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User; // ตรวจสอบว่าคุณใช้ Model ที่ถูกต้อง
 
 class DashboardController extends Controller
 {

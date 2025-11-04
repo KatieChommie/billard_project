@@ -19,10 +19,10 @@
 
             {{-- ** แสดงข้อผิดพลาด Validation ** --}}
             @if ($errors->any())
-                <div class="error-message">
+                <div class="alert-message error">
                     <ul>
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li style="list-style: none;">{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>

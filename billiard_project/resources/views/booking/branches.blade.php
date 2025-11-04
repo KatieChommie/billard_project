@@ -3,6 +3,12 @@
 @section('content')
 <section class='branches-container'>
     <h1>สาขาทั้งหมดของเรา</h1>
+
+    <div class='index-buttons'>
+        <a href="{{ route('menu') }}" class='button' style='color: inherit;'>ดูเมนูอาหาร</a>
+        <a href="{{ route('booking.table') }}" class='button' style='color: inherit;'>จองโต๊ะ</a>
+    </div>
+    
     <div class='branches-grid'>
         @foreach ($branches as $branch)
         <div class='list-of-branches'>

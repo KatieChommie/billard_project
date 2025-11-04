@@ -21,9 +21,8 @@
     </div>
     
     <div class='index-buttons'>
-        <!--<a href='/billiard/booking.php' class='btn btn-primary' style='color: inherit;'>จองโต๊ะเลย!</a>-->
         <a href="{{ route('menu') }}" class='button' style='color: inherit;'>ดูเมนูอาหาร</a>
-        <a href="{{ route('booking.reservation') }}" class='button' style='color: inherit;'>จองโต๊ะ</a>
+        <a href="{{ route('booking.table') }}" class='button' style='color: inherit;'>จองโต๊ะ</a>
     </div>
 
 </section>

@@ -28,8 +28,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('user.dashboard', absolute: false));
-    }
+        $user = Auth::user();
+
+        // 2. เช็กอีเมล (ต้องเป็นอีเมลเดียวกับที่คุณใช้ใน Middleware นะครับ)
+        if ($user->email === 'admin@billiard.com') {
+
+        // ถ้าเป็นแอดมิน ส่งไป แดชบอร์ดแอดมิน
+            return redirect()->route('admin.dashboard');
+        }
+
+        //ถ้าเป็น User ส่งไปหน้าแดชบอร์ดปกติ
+            return redirect()->intended(route('user.dashboard', absolute: false));
+        }
 
     /**
      * Destroy an authenticated session.

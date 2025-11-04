@@ -16,24 +16,59 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             // **แก้ไขให้ตรงกับคอลัมน์ในฐานข้อมูลจริงของคุณ:**
-            'name' => 'Chompoo',
+            ['user_id' => 1,
+            'first_name' => 'Chompoo',
             'last_name' => 'Panyanarupol',
             'email' => 'test1@example.com', 
             'password' => Hash::make('password'),
-            'email_verified_at' => now(), // เพิ่มให้ครบถ้วน 
-            
-            // คอลัมน์อื่น ๆ ที่มีอยู่ในตารางจริง
+            'email_verified_at' => now(),
             'username' => 'KatieChommie', 
             'phone_number' => '0811111111', 
             'date_of_birth' => Carbon::parse('2000-01-15'), 
             'loyalty_points' => 100, 
-            
-            // คอลัมน์ Timestamp มาตรฐานของ Laravel
             'created_at' => now(), 
-            'updated_at' => now(), 
-            
-            // หมายเหตุ: คอลัมน์ email_verified_at, remember_token ควรมีค่าเป็น null ถ้าไม่ได้ใส่
-        ]);
+            'updated_at' => now(),
+        ],
+        [
+            'user_id' => 2, 
+            'first_name' => 'Piyawan', 
+            'last_name' => 'Test', 
+            'email' => 'test2@example.com', 
+            'password' => Hash::make('password'),
+            'email_verified_at' => null,
+            'username' => 'user_piyawan', 
+            'phone_number' => '0822222222', 
+            'date_of_birth' => '2004-02-02', 
+            'loyalty_points' => 100, 
+            'created_at' => now(), 'updated_at' => now(),
+            ],
+            [
+            'user_id' => 3, 
+            'first_name' => 'Rattanaporn', 
+            'last_name' => 'Test', 
+            'email' => 'test3@example.com', 
+            'password' => Hash::make('password'),
+            'email_verified_at' => null,
+            'username' => 'user_rat', 
+            'phone_number' => '0833333333', 
+            'date_of_birth' => '2004-03-03', 
+            'loyalty_points' => 100, 
+            'created_at' => now(), 'updated_at' => now(),
+            ],
+            [
+            'user_id' => 4, 
+            'first_name' => 'Supannapat', 
+            'last_name' => 'Test', 
+            'email' => 'test4@example.com', 
+            'password' => Hash::make('password'),
+            'email_verified_at' => null,
+            'username' => 'user_sup', 
+            'phone_number' => '0844444444', 
+            'date_of_birth' => '2004-04-04', 
+            'loyalty_points' => 100, 
+            'created_at' => now(), 'updated_at' => now(),
+            ], 
+    ]);
 
     }
 }

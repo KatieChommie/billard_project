@@ -3,16 +3,24 @@
 
 @section('content')
 <div class="user-dashboard">
+    <a href="{{ route('home') }}" class="back-link" aria-label="ย้อนกลับ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>กลับไปยังหน้าหลัก</span>
+    </a>
     <h1>สวัสดีคุณ {{ Auth::user()->username }}!</h1>
     
     <section class="user-info-section">
             <h2>1. ข้อมูลทั่วไป</h2>
             <div class="info-grid">
-                <p><strong>ชื่อที่ใช้ในการจอง:</strong> <span>{{ Auth::user()->name}} {{ Auth::user()->last_name}}</span></p>
+                <p><strong>ชื่อที่ใช้ในการจอง:</strong> <span>{{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</span></p>
                 <p><strong>เบอร์โทรศัพท์:</strong> <span>{{ Auth::user()->phone_number }}</span></p>
                 <p><strong>วันเกิด:</strong> <span>{{ Auth::user()->date_of_birth }}</span></p>
                 <p><strong>แต้มคะแนนสะสม:</strong> <span class="highlight-points">{{ Auth::user()->loyalty_points }}</span></p>
             </div>
+            <a href="{{ route('points.index') }}" class='button'>จัดการคะแนนสะสมและคูปอง</a>
         </section>
 
         <section class="booking-history-section">

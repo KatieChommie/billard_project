@@ -38,9 +38,14 @@
                 <h3>{{ $item->menu_name }}</h3>
                 <p class='description'></p>
                 <p class='price'>{{ $item->price }}฿</p>
-                
+
+                {{-- **Logic ตรวจสอบสต็อก** --}}
+                @if ($item->stock_qty > 0)
+                    <button class='add-to-cart-btn'>สั่งเลย</button>
+                @else
                 {{-- โค้ดที่แก้ไข: แสดงปุ่ม "สั่งเลย" โดยไม่ต้องเช็คสต็อก --}}
                 <button class='add-to-cart-btn'>สั่งเลย</button>
+                @endif
             </div>
         @endforeach
         
