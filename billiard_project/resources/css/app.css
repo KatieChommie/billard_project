@@ -1,4 +1,6 @@
-
+/* resources/css/app.css */
+@tailwind components;
+@tailwind utilities;
 /* /css/style.css */
 * {
     margin: 0;
@@ -1182,6 +1184,11 @@ tr:hover {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+.branches-container #descrpt{
+    font-size: 1.35rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
 .branches-container .branches-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -1192,6 +1199,7 @@ tr:hover {
 .branches-container .list-of-branches {
     padding-bottom: 55px;
     border-radius: 8px;
+    text-decoration: none;
     justify-content: center;
     align-items: center;
     height: auto;
@@ -1559,37 +1567,55 @@ tr:hover {
     font-family: var(--font-thai);
     font-size: 1.2rem;
     font-weight: 300;
-    color: white;
-    border: none;
+    color: rgb(0, 0, 0);
+    border: 3px solid transparent; /* 1.1 เพิ่มขอบใสๆ ไว้ก่อน (เพื่อไม่ให้ layout กระโดด) */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
-    transition: background-color 0.2s;
+    /* 1.2 เพิ่ม transition ให้ครบทุกอย่าง */
+    transition: background-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
-.table-btn:hover{
-    background-color: var(--link-hover-color);
+.table-btn .table-name {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgb(0, 0, 0);
 }
 
-
-/* สไตล์สีตามสถานะ */
-.status-green {
-    background-color: var(--primary-color); /* Available */
-}
-.status-red {
-    background-color: #dc3545; /* Reserved */
-}
-.status-gray {
-    background-color: #6c757d; /* Unavailable */
-    cursor: not-allowed;
-}
-
-.status-gray .status-text, 
-.status-red .status-text {
+.table-btn .status-text {
     display: block;
     font-size: 0.8rem;
     font-weight: 400;
     opacity: 0.9;
+    /* (บังคับใส่สีกลับเข้าไป) */
+    color: rgb(0, 0, 0);
 }
+
+.table-btn.selected {
+    background-color: #099114;
+    color: white;
+    border-color: #067421;
+    transform: scale(0.95); 
+    box-shadow: 0 0 10px rgba(5, 141, 34, 0.5);
+}
+
+
+/* 5. กฎความปลอดภัย (กัน Error) */
+/* * ถ้าโต๊ะสีแดง/เทา ถูก JS สั่งให้ .selected (ซึ่งไม่ควรเกิด)
+ * ให้บังคับมันกลับไปเป็นสีเดิม
+*/
+.table-btn.status-red.selected,
+.table-btn.status-gray.selected {
+    background-color: #dc3545; /* บังคับเป็นสีแดง */
+    color: rgb(0, 0, 0);       /* บังคับสีตัวอักษรกลับ */
+    border-color: transparent; /* บังคับขอบกลับ */
+    transform: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.table-btn.status-gray.selected {
+     background-color: #6c757d; /* บังคับเป็นสีเทา */
+}
+
 
 .confirm-booking-btn{
     font-family: var(--font-thai);
@@ -1613,6 +1639,9 @@ tr:hover {
     background-color: var(--link-hover-color);
 }
 
+.hidden {
+    display: none; 
+}
 
 /*Reviews*/
 .review-container{

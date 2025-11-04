@@ -12,7 +12,7 @@ class RewardTransactSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('reward_transaction')->insert([
+       /* DB::table('reward_transaction')->insert([
             [
                 'transact_id' => 40001, 
                 'user_id' => 1, 
@@ -29,6 +29,6 @@ class RewardTransactSeeder extends Seeder
                 'transact_descrpt' => 'แลกเป็นส่วนลด 300 แต้ม แลกส่วนลด 60 บาท', 
                 'transact_date' => now()
             ],
-        ]);
+        ]);*/
     }
 }

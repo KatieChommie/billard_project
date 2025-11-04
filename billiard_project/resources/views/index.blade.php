@@ -22,7 +22,7 @@
     
     <div class='index-buttons'>
         <a href="{{ route('menu') }}" class='button' style='color: inherit;'>ดูเมนูอาหาร</a>
-        <a href="{{ route('booking.table') }}" class='button' style='color: inherit;'>จองโต๊ะ</a>
+        <a href="{{ route('booking.branches') }}" class='button' style='color: inherit;'>เลือกสาขาเพื่อทำการจอง</a>
     </div>
 
 </section>

@@ -12,7 +12,7 @@ class PurchaseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('purchase')->insert([
+        /*DB::table('purchase')->insert([
         [
             'purchase_id' => 80001, 
             'order_id' => 20002,
@@ -31,6 +31,6 @@ class PurchaseSeeder extends Seeder
             'total_price' => 20,
             
         ],
-    ]);
+    ]);*/
     }
 }

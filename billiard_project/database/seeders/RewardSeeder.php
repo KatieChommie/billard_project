@@ -12,7 +12,7 @@ class RewardSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('reward')->insert([
+       /* DB::table('reward')->insert([
             [
                 'reward_id' => 30001, 
                 'user_id' => 1, // สมมติ user_id เป็น 1
@@ -35,7 +35,7 @@ class RewardSeeder extends Seeder
                 'issued_date' => '2025-09-01', 
                 'expired_date' => '2025-09-08'
             ],
-        ]);
+        ]);*/
         
     }
 }

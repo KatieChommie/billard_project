@@ -12,7 +12,7 @@ class ReviewSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('review')->insert([
+     /*   DB::table('review')->insert([
             [
                 'review_id' => 50001, 
                 'user_id' => 3, 
@@ -29,6 +29,6 @@ class ReviewSeeder extends Seeder
                 'rating' => 2,
                 'created_at' => now(), 'updated_at'=>now()
             ],
-        ]);
+        ]);*/
     }
 }

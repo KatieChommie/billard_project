@@ -12,7 +12,7 @@ class PaymentSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('payment')->insert([
+        /*DB::table('payment')->insert([
 
             [
                 'pay_id' => 60001, 
@@ -34,6 +34,6 @@ class PaymentSeeder extends Seeder
                 'pay_method' => null, 
                 'pay_status' => 'pending'
             ],
-        ]);
+        ]);*/
     }
 }

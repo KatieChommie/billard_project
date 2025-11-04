@@ -23,10 +23,10 @@ Route::get('/menu/{branchId?}', [SiteController::class, 'menu'])->name('menu');
 Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
 
 Route::get('/booking/branches', [SiteController::class, 'branches'])->name('booking.branches');
-Route::get('/booking/reservation', [ReservationController::class, 'reservation'])->name('booking.reservation');
-Route::get('/booking/table', [ReservationController::class, 'showBookingForm'])->name('booking.table');
+Route::get('/booking/table/{branchId}', [ReservationController::class, 'showBookingForm'])->name('booking.table');
 Route::post('/booking/check', [ReservationController::class, 'checkTableAvailability'])->name('reservation.check');
-Route::post('/reservation/confirm', [ReservationController::class, 'confirmBooking'])->name('reservation.confirm');
+Route::post('/reservation/confirm', [ReservationController::class, 'reserveTable'])->name('reservation.confirm');
+
 Route::get('/orders/order', [SiteController::class, 'order'])->name('orders.order');
 Route::get('/points', [SiteController::class, 'pointsPage'])->name('points.index');
 Route::get('/points/history', [SiteController::class, 'pointsHistoryPage'])->name('points.history');
