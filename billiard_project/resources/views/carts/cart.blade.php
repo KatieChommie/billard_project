@@ -4,6 +4,15 @@
 @section('content')
 <main class="cart-container">
     
+    <a href="{{ route('booking.branches') }}" class="back-link" aria-label="ย้อนกลับไปหน้าจองโต๊ะ" style="position: static; text-decoration: none; color: #333; display: inline-flex; align-items: center; gap:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        
+        <span style="font-weight:600;">กลับไปยังหน้าจองเลือกสาขา</span>
+    </a>
+
     <h1 style="text-align: center; margin-bottom: 1.5rem;">ตะกร้าสินค้า</h1>
 
     {{-- (แสดง Error/Success Messages) --}}
@@ -26,7 +35,7 @@
             <p><strong>สาขา:</strong> {{ $cartTable['display_branch_name'] }}</p>
             <p><strong>โต๊ะหมายเลข:</strong> {{ $cartTable['display_table_numbers'] }}</p>
             <p><strong>เวลา:</strong> {{ $cartTable['display_time'] }} ({{ $cartTable['duration'] }} นาที)</p>
-            <p style="font-weight: 600; font-size: 1.1rem; margin-top: 10px;">
+            <p style="font-weight: 600; font-size: 1.1rem; margin-top: 10px; margin-bottom: 15px;">
                 ราคา: {{ number_format($cartTable['price'], 2) }} THB
             </p>
         </div>
@@ -46,7 +55,7 @@
                 {{-- (คุณสามารถเพิ่มรูปภาพตรงนี้ได้ ถ้าส่งมาจาก CartController) --}}
                 
                 <div class="cart-item-details">
-                    <h4>{{ $details['name'] }}</h4>
+                    <h4>{{ $details['menu_name'] }}</h4>
                     <p>ราคา: {{ number_format($details['price'], 2) }} THB</p>
                     <p>รวม: {{ number_format($details['price'] * $details['quantity'], 2) }} THB</p>
                 </div>

@@ -3,14 +3,23 @@
 @section('content')
 
 <section class='menu-container'>
+    {{-- Display Success Messages --}}
     @if(session('success'))
         <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin: 0 auto 20px auto; max-width: 800px; text-align: center;">
             {{ session('success') }}
         </div>
     @endif
+    
+    {{-- *** NEW: Display Error Messages (ถ้าเกิด Validation Fail หรือ Stock Check Fail) *** --}}
+    @if(session('error'))
+        <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 0 auto 20px auto; max-width: 800px; text-align: center;">
+            {{ session('error') }}
+        </div>
+    @endif
+    {{-- *** END NEW *** --}}
 
     <h1>เมนูอาหาร ของว่าง และเครื่องดื่ม</h1>
-
+    
     <div class="branch-selector">
         <label for="branch-select">เลือกสาขา:</label>
         <select id="branch-select" onchange="window.location.href='/menu/' + this.value">
@@ -49,13 +58,13 @@
                 <form action="{{ route('cart.add') }}" method="POST" style="padding: 0 15px; margin-top:10px;">
                     @csrf
                     <input type="hidden" name="menu_id" value="{{ $item->menu_id }}">
-                    <input type="hidden" name="name" value="{{ $item->menu_name }}">
+                    <input type="hidden" name="menu_name" value="{{ $item->menu_name }}"> {{-- <-- แก้ไข: ใช้ menu_name --}}
                     <input type="hidden" name="price" value="{{ $item->price }}">
                     <input type="hidden" name="branch_id" value="{{ $selectedBranchId }}">
 
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <label for="menu_qty-{{ $item->menu_id }}" style="white-space: nowrap;">จำนวน:</label>
-                        <input type="number" id="menu_qty-{{ $item->menu_id }}" name="menu_qty" value="1" min="1"
+                        <label for="quantity-{{ $item->menu_id }}" style="white-space: nowrap;">จำนวน:</label>
+                        <input type="number" id="quantity-{{ $item->menu_id }}" name="quantity" value="1" min="1" 
                             style="width: 100%; border: 1px solid #ccc; border-radius: 5px; padding: 5px;">
                     </div>
 

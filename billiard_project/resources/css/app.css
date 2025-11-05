@@ -1017,16 +1017,24 @@ tr:hover {
 
 /* Status Badges */
 .status-completed,
-.status-confirmed,
 .status-upcoming,
 .status-cancelled {
+    font-weight: 400;
+    font-size: 1.05em;
+    margin:1rem 0.2rem 0.2rem 14px;
+    padding: 8px 15px;
+    border-radius: 8px;
+    display: flex;
+    /* ********************************************* */
+}
+
+.status-confirmed{
     font-weight: 400;
     font-size: 1.05em;
     margin:0.2rem 0.2rem 0.2rem 14px;
     padding: 8px 15px;
     border-radius: 8px;
-    display: inline-block;
-    /* ********************************************* */
+    display: flex;
 }
 
 .status-completed {
@@ -1048,12 +1056,19 @@ tr:hover {
     background-color: #DC3545;
 }
 
+.pay-button, .cancel-btn-custom{
+    display: inline-flex; /* keep them inline with surrounding text */
+    align-items: center;
+    gap: 8px; /* internal gap for icon + label if any */
+}
+
 .pay-button {
     background-color: #FFC107;
     color: var(--text-color);
     text-decoration: none;
     padding: 8px 15px;
     border-radius: 8px;
+    margin-right: 10px; /* space between pay and cancel buttons */
 }
 
 .pay-button:hover{
@@ -1065,6 +1080,14 @@ tr:hover {
     text-decoration: none;
     padding: 8px 15px;
     border-radius: 8px;
+}
+
+/* Action buttons container to keep multiple actions on one line */
+.action-buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px; /* space between buttons */
 }
 
 .cancel-btn-custom:hover{
@@ -1302,6 +1325,7 @@ tr:hover {
     margin: 10px 0;
 }
 .redeem-btn {
+    font-family: var(--font-thai);
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -1617,6 +1641,17 @@ tr:hover {
     border-radius: 10px;
 }
 
+.cart-container .back-link{
+    background-color: #cfd4da;
+    width: auto; 
+    padding: 0 12px 0 12px; 
+    border-radius: 10px;
+}
+.cart-container .back-link:hover{
+    background-color: #aeb2b6;
+}
+
+
 .cart-item {
     display: flex;
     align-items: center;
@@ -1650,6 +1685,7 @@ tr:hover {
     border-radius: 5px;
 }
 .update-btn {
+    font-family: var(--font-thai);
     background: #007bff;
     color: white;
     border: none;
@@ -1658,6 +1694,7 @@ tr:hover {
     cursor: pointer;
 }
 .remove-btn {
+    font-family: var(--font-thai);
     background: #dc3545;
     color: white;
     border: none;
@@ -1676,6 +1713,7 @@ tr:hover {
     font-weight: 700;
 }
 .checkout-btn {
+    font-family: var(--font-thai);
     background-color: var(--primary-color);
     color: white;
     padding: 12px 25px;

@@ -94,15 +94,16 @@
                             <td>{{ number_format($booking->final_amount, 2) }} บาท</td>
                             <td>
                                 @if ($booking->order_status == 'pending')
-                                    <a href="{{ route('checkout.page', ['order_id' => $booking->order_id]) }}" 
-                                        class="pay-button">ชำระเงิน</a>
-                                    <form action="{{ route('dashboard.booking.cancel') }}" method="POST" 
-                                        onsubmit="return confirm('คุณต้องการยกเลิกการจองนี้ใช่หรือไม่?');" style="display: inline;">
-                                        @csrf
-                                        <input type="hidden" name="order_id" value="{{ $booking->order_id }}">
-                
-                                        <button type="submit" class="cancel-btn-custom">ยกเลิก</button>
-                                    </form>
+                                    <div class="action-buttons">
+                                        <a href="{{ route('checkout.page', ['order_id' => $booking->order_id]) }}" 
+                                            class="pay-button">ชำระเงิน</a>
+                                        <form action="{{ route('dashboard.booking.cancel') }}" method="POST" 
+                                            onsubmit="return confirm('คุณต้องการยกเลิกการจองนี้ใช่หรือไม่?');">
+                                            @csrf
+                                            <input type="hidden" name="order_id" value="{{ $booking->order_id }}">
+                                            <button type="submit" class="cancel-btn-custom">ยกเลิก</button>
+                                        </form>
+                                    </div>
                                 @elseif ($booking->order_status == 'completed')
             
                                     {{-- (แก้ไข) เช็คว่า branch_id นี้ อยู่ในลิสต์ที่รีวิวแล้วหรือยัง --}}

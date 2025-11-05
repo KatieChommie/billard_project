@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log; // เพิ่ม Log เพื่อช่วย Debug
 
 class CartController extends Controller
 {
@@ -21,7 +22,6 @@ class CartController extends Controller
         
         $totalFood = 0;
         foreach ($cartFood as $id => $details) {
-            // ใช้ 'quantity' ในการคำนวณ
             $totalFood += $details['price'] * $details['quantity'];
         }
 
@@ -41,42 +41,55 @@ class CartController extends Controller
     {
         $request->validate([
             'menu_id' => 'required|integer|exists:menus,menu_id',
-            'quantity' => 'required|integer|min:1', // <--- แก้ไข: ใช้ 'quantity'
-            'menu_name' => 'required|string',
+            'quantity' => 'required|integer|min:1', 
+            'menu_name' => 'required|string', // ถูกแก้ไขใน Blade แล้ว
             'price' => 'required|numeric',
             'branch_id' => 'required|integer|exists:branches,branch_id',
         ]);
 
         $branchId = $request->branch_id;
-        $quantity = (int)$request->quantity; // <--- แก้ไข: ดึงค่าจาก 'quantity'
-        
-        // (ใหม่) ตรวจสอบ Branch ID
+        $quantity = (int)$request->quantity;
+        $menuId = $request->menu_id;
+
+        // 1. ตรวจสอบว่าสั่งอาหารข้ามสาขาที่จองโต๊ะหรือไม่
         $cartTable = session()->get('cart.table', null);
-        
         if ($cartTable && $cartTable['branch_id'] != $branchId) {
             return redirect()->back()->with('error', 'คุณสามารถสั่งอาหารได้เฉพาะสาขาที่จองโต๊ะไว้เท่านั้น');
         }
         
-        // (ถ้าไม่มีโต๊ะ หรือ สาขาตรงกัน)
-        $cartFood = session()->get('cart.food', []);
-        $menuId = $request->menu_id;
+        // 2. ตรวจสอบสต็อก
+        $inventory = DB::table('inventory')
+                    ->where('menu_id', $menuId)
+                    ->where('branch_id', $branchId)
+                    ->first();
+        
+        // *** Logic Stock Check: ใช้ stock_qty ตาม Migration ***
+        // ถ้ามีรายการ inventory และ stock_qty ไม่พอ -> แจ้ง error
+        if ($inventory && $inventory->stock_qty < $quantity) {
+             return back()->with('error', 'สินค้าหมด หรือมีไม่เพียงพอสำหรับสาขานี้');
+        } 
+        
+        // ถ้า $inventory เป็น null (ไม่มีข้อมูลสต็อก) ให้อนุญาตให้เพิ่มเข้าตะกร้าได้
+        // (เพราะถ้ามีสต็อกจริง แต่ไม่มี record แปลว่ามี bug ใน Seeder/Migration แต่เราจะไม่กันผู้ใช้)
 
+
+        // 3. บันทึก/อัปเดต Session
+        $cartFood = session()->get('cart.food', []);
+        
         if (isset($cartFood[$menuId])) {
-            // ถ้ามีอยู่แล้ว ให้อัปเดตจำนวน
             $cartFood[$menuId]['quantity'] += $quantity;
         } else {
-            // ถ้ายังไม่มี ให้เพิ่มใหม่
             $cartFood[$menuId] = [
                 "menu_name" => $request->menu_name,
-                "quantity" => $quantity, // <--- แก้ไข: ใช้คีย์ 'quantity' ใน Session
+                "quantity" => $quantity, 
                 "price" => $request->price,
                 "branch_id" => $branchId,
             ];
         }
 
-        session()->put('cart.food', $cartFood); // (บันทึกใน cart.food)
+        session()->put('cart.food', $cartFood); 
 
-        // (แก้ไข) เปลี่ยน redirect ไปหน้า Cart
+        // 4. Redirect ไปหน้า Cart
         return redirect()->route('cart.index')->with('success', 'เพิ่มสินค้าลงในตะกร้าเรียบร้อย!');
     }
 
@@ -87,14 +100,29 @@ class CartController extends Controller
     {
         $request->validate([
             'menu_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1', // <--- แก้ไข: ใช้ 'quantity'
+            'quantity' => 'required|integer|min:1', 
         ]);
 
         $cartFood = session()->get('cart.food', []);
         $menuId = $request->menu_id;
         if (isset($cartFood[$menuId])) {
-            // ใช้ 'quantity'
-            $cartFood[$menuId]['quantity'] = (int)$request->quantity;
+            // (เราต้องเช็คสต็อกก่อน Update)
+            $newQuantity = (int)$request->quantity;
+            $branchId = $cartFood[$menuId]['branch_id'];
+
+            // 1. ตรวจสอบสต็อกก่อนอัปเดต
+            $inventory = DB::table('inventory')
+                        ->where('menu_id', $menuId)
+                        ->where('branch_id', $branchId)
+                        ->first();
+            
+            // ใช้ stock_qty ในการตรวจสอบ
+            if ($inventory && $inventory->stock_qty < $newQuantity) {
+                 return back()->with('error', 'ไม่สามารถอัปเดตได้ สินค้ามีไม่เพียงพอ');
+            } 
+
+            // 2. ถ้าสต็อกพอ -> อัปเดต
+            $cartFood[$menuId]['quantity'] = $newQuantity;
             session()->put('cart.food', $cartFood);
         }
         return redirect()->route('cart.index')->with('success', 'อัปเดตจำนวนสินค้าแล้ว');
@@ -121,17 +149,14 @@ class CartController extends Controller
         
         if (!Auth::check()) { /* ... (Auth check) ... */ }
         
-        // (แก้ไข) ต้องมีอย่างน้อย 1 อย่าง (โต๊ะ หรือ อาหาร)
         if (empty($cartTable) && empty($cartFood)) {
             return redirect()->route('cart.index')->with('error', 'ตะกร้าของคุณว่างเปล่า');
         }
 
         $userId = Auth::id();
 
-        // (แก้ไข) คำนวณยอดรวมใหม่
         $totalAmount = ($cartTable['price'] ?? 0);
         foreach ($cartFood as $id => $details) {
-            // ใช้ 'quantity' ในการคำนวณ
             $totalAmount += $details['price'] * $details['quantity'];
         }
 
@@ -146,6 +171,7 @@ class CartController extends Controller
                 ]);
                 $newOrderId = $orderId;
 
+                // Reservation Logic (เหมือนเดิม)
                 if ($cartTable) {
                     $reservationItems = [];
                     foreach ($cartTable['table_ids'] as $tableId) {
@@ -160,6 +186,7 @@ class CartController extends Controller
                     DB::table('reservation')->insert($reservationItems);
                 }
 
+                // Purchase Logic (อาหาร)
                 if (!empty($cartFood)) {
                     $purchaseItems = [];
                     foreach ($cartFood as $id => $details) {
@@ -167,25 +194,23 @@ class CartController extends Controller
                             'order_id' => $orderId,
                             'menu_id' => $id,
                             'branch_id' => $details['branch_id'],
-                            'menu_qty' => $details['quantity'], // <--- ใช้ 'quantity' จาก Session
+                            'menu_qty' => $details['quantity'],
                             'total_price' => $details['price'] * $details['quantity'],
                         ];
                     }
                     DB::table('purchase')->insert($purchaseItems);
 
-                    // (แก้ไข) ต้องมั่นใจว่า inventory มีคอลัมน์ชื่อ 'quantity'
+                    // *** สำคัญ: ลดสต็อกโดยใช้คอลัมน์ 'stock_qty' ***
                     foreach ($purchaseItems as $item) {
                         DB::table('inventory')
                             ->where('menu_id', $item['menu_id'])
-                            // สังเกต: decremennt ใช้คอลัมน์ชื่อ 'quantity' ซึ่งอาจจะต้องเป็น 'stock_qty'
-                            // ถ้า schema inventory ใช้ stock_qty เราต้องแก้เป็น:
-                            // ->decrement('stock_qty', $item['menu_qty']);
-                            // แต่ผมจะคงตามโค้ดเดิมของคุณไว้ก่อน (decrement('quantity'))
+                            // แก้ไข: ใช้ 'stock_qty' ตาม schema ของคุณ
                             ->decrement('stock_qty', $item['menu_qty']); 
                     }
                     
                 }
 
+                // Payment Logic (เหมือนเดิม)
                 DB::table('payment')->insert([
                     'order_id' => $orderId,
                     'total_amount' => $totalAmount,
@@ -204,9 +229,12 @@ class CartController extends Controller
                              ->with('success', 'สร้าง Order สำเร็จ! กรุณาชำระเงิน');
 
         } catch (\Exception $e) {
-            return redirect()->route('cart.index')->withErrors(['message' => 'เกิดข้อผิดพลาดในการสร้าง Order: ' . $e->getMessage()]);
+            // (ใช้ Log เพื่อ Debug Error จริงๆ บน Server)
+            Log::error("Checkout Failed for User ID $userId: " . $e->getMessage()); 
+            return redirect()->route('cart.index')->withErrors(['message' => 'เกิดข้อผิดพลาดในการสร้าง Order: กรุณาลองใหม่อีกครั้ง']);
         }
-    }    public function clear()
+    }    
+    public function clear()
     {
         session()->forget('cart');
         return redirect()->route('cart.index')->with('success', 'ล้างตะกร้าสินค้าทั้งหมดแล้ว');
