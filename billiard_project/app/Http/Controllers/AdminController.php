@@ -28,7 +28,7 @@ class AdminController extends Controller
 public function markAsCompleted(Request $request)
     {
         // 1. ตรวจสอบสิทธิ์ (สมมติว่าคุณมี Admin Middleware แล้ว)
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (! Auth::check() || Auth::user()->role !== 'admin') {
             return redirect('/admin/login')->with('error', 'Unauthorized access.');
         }
 

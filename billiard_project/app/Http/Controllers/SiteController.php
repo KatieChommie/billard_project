@@ -78,12 +78,15 @@ class SiteController extends Controller
         $reviews = DB::table('review')
             ->join('users', 'review.user_id', '=', 'users.user_id')
             ->select(
-                'review.review_rating', 'review.review_text', 'review.review_date',
-                'users.first_name', 'users.last_name',
-                'review.order_id' // (ดึง order_id มาแสดงด้วยก็ได้)
+                'review.rating', 
+                'review.review_descrpt AS review_text',
+                'review.created_at AS review_date',
+                'users.first_name',
+                'users.last_name',
+                'review.order_id'
             )
             ->whereNotNull('review.order_id')
-            ->orderBy('review_date', 'desc')
+            ->orderBy('review.created_at', 'desc')
             ->get();
 
         // 2. ค้นหา "การจองที่รอรีวิว" (สำหรับ User ที่ล็อกอิน)
@@ -96,19 +99,17 @@ class SiteController extends Controller
             $completedOrders = DB::table('orders')
                 ->join('reservation', 'orders.order_id', '=', 'reservation.order_id')
                 ->where('orders.user_id', $userId)
-                ->where('orders.order_status', 'completed') // <-- ต้อง completed เท่านั้น
+                ->where('orders.order_status', 'completed')
                 ->select('orders.order_id', 'reservation.start_time')
                 ->groupBy('orders.order_id', 'reservation.start_time')
                 ->get();
             
             if ($completedOrders->isNotEmpty()) {
-                // 2b. ค้นหาว่า Order ไหน "รีวิวไปแล้วบ้าง"
                 $reviewedOrderIds = DB::table('review')
                     ->where('user_id', $userId)
                     ->whereNotNull('order_id')
                     ->pluck('order_id');
-                
-                // 2c. กรองเอาเฉพาะ Order ที่ "ยังไม่เคยรีวิว"
+
                 $bookings_to_review = $completedOrders->whereNotIn('order_id', $reviewedOrderIds);
             }
         }
@@ -120,28 +121,25 @@ class SiteController extends Controller
     }
     public function submitReview(Request $request)
     {
-        // 1. ตรวจสอบข้อมูล (เพิ่ม order_id)
         $request->validate([
             'order_id' => 'required|integer|exists:orders,order_id', 
             'rating' => 'required|integer|min:1|max:5',
-            'review_text' => 'required|string|min:10|max:500', // (ใช้ review_text แทน review_descrpt)
+            'review_text' => 'required|string|min:10|max:500',
         ]);
 
         $userId = Auth::id();
         $orderId = $request->input('order_id');
 
-        // 2. ตรวจสอบซ้ำว่า Order นี้ 'completed' และเป็นของ User นี้จริง
         $validOrder = DB::table('orders')
             ->where('order_id', $orderId)
             ->where('user_id', $userId)
-            ->where('order_status', 'completed') // <-- ต้อง completed
+            ->where('order_status', 'completed')
             ->first();
         
         if (!$validOrder) {
-            return back()->withInput()->withErrors(['message' => 'คุณไม่สามารถรีวิวการจองนี้ได้ เนื่องจากยังไม่เสร็จสิ้น']);
+            return back()->withInput()->withErrors(['message' => 'คุณไม่สามารถรีวิวการจองนี้ได้ เนื่องจากการจองยังไม่เสร็จสิ้น']);
         }
 
-        // 3. บันทึกลงฐานข้อมูล (ใช้ field review_descrpt ตาม schema)
         try {
             DB::table('review')->insert([
                 'user_id' => $userId,
@@ -149,11 +147,10 @@ class SiteController extends Controller
                 // (ต้องใส่ค่าของ review_descrpt และ rating ให้ถูกต้องตาม schema)
                 'review_descrpt' => $request->input('review_text'), // <-- ใช้ field ที่ถูกต้อง
                 'rating' => $request->input('rating'),
-                'review_date' => Carbon::now(), // (review_date ถูกสร้างโดย timestamps)
-                // ไม่ต้องใส่ branch_id เพราะ migration เดิมไม่บังคับ
+                'created_at' => Carbon::now(),                  
+                'updated_at' => Carbon::now(),
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
-            // (ดักจับ Error กรณีรีวิวซ้ำ)
             if ($e->errorInfo[1] == 1062) { // 1062 = Duplicate entry
                 return back()->withInput()->withErrors(['message' => 'คุณได้รีวิวการจองนี้ไปแล้ว']);
             }

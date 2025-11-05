@@ -3,7 +3,7 @@
 
 @section('content')
 <main class="reviews-container">
-    {{-- ... --}}
+    <h1>รีวิวจากลูกค้าของเรา</h1>
 
     <section class="review-form-box">
         @auth
@@ -36,7 +36,9 @@
                         <label>ให้คะแนน:</label>
                         <div class="star-rating">
                             <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 stars">★</label>
-                            {{-- ... (star 4, 3, 2, 1) ... --}}
+                            <input type="radio" id="star4" name="rating" value="4" required/><label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" required/><label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" required/><label for="star2" title="2 stars">★</label>
                             <input type="radio" id="star1" name="rating" value="1" required/><label for="star1" title="1 star">★</label>
                         </div>
                     </div>
@@ -75,7 +77,7 @@
                 <p class="review-date">
                     รีวิวเมื่อ: {{ \Carbon\Carbon::parse($review->review_date)->diffForHumans() }}
                     {{-- (เพิ่ม) ถ้าต้องการแสดงว่ารีวิว Order ไหน --}}
-                    {{-- @if ($review->order_id) (Order #{{ $review->order_id }}) @endif --}}
+                    @if ($review->order_id) (Order #{{ $review->order_id }}) @endif
                 </p>
             </div>
         @empty
