@@ -164,7 +164,8 @@
 <script>
     // --- 1. โค้ดเดิมของคุณ (สำหรับการคลิกและคำนวณราคา) ---
     const selectedTables = new Set();
-    const pricePerHalfHour = 50; 
+    const pricePerHalfHour = 50;
+    
     
     function calculatePrice(numTables) {
         // (แก้ไข) เราต้องหา dropdown นี้ "ข้างใน" ฟังก์ชัน

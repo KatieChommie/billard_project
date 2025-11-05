@@ -163,15 +163,13 @@ class CartController extends Controller
                         ];
                     }
                     DB::table('purchase')->insert($purchaseItems);
-                }
 
-                
-                // Decrement stock in inventory: inventory column is `stock_qty` and inventory is per-branch
-                foreach ($purchaseItems as $item) {
-                    DB::table('inventory')
-                        ->where('menu_id', $item['menu_id'])
-                        ->where('branch_id', $item['branch_id'])
-                        ->decrement('stock_qty', $item['menu_qty']);
+                    foreach ($purchaseItems as $item) {
+                        DB::table('inventory')
+                            ->where('menu_id', $item['menu_id'])
+                            ->decrement('quantity', $item['menu_qty']);
+                    }
+                    
                 }
 
                 DB::table('payment')->insert([

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
@@ -26,6 +27,19 @@ class ReservationController extends Controller
             
             // (เพิ่ม) ส่ง $branchId ไปด้วย (สำหรับ Form)
             $viewData['branchId'] = $branchId; 
+
+            // (เพิ่ม) ถ้าผู้ใช้ส่ง selectedBranch มา ให้ตั้งชื่อสาขาให้ view ใช้งานได้
+            if (isset($viewData['selectedBranch']) && is_object($viewData['selectedBranch'])) {
+                $viewData['branchName'] = $viewData['selectedBranch']->branch_name ?? null;
+            } else {
+                $branchObj = $allBranches->firstWhere('branch_id', $branchId);
+                $viewData['branchName'] = $branchObj ? $branchObj->branch_name : null;
+            }
+
+            // (เพิ่ม) ให้แน่ใจว่า tables เป็น Collection/array ที่ view จะ iterate ได้
+            if (isset($viewData['tables'])) {
+                $viewData['tables'] = collect($viewData['tables']);
+            }
             
             return view('booking.table', $viewData);
         }
@@ -65,6 +79,8 @@ class ReservationController extends Controller
         ]);
     }
     // ฟังก์ชันหลัก: ตรวจสอบสถานะโต๊ะและแสดงผล (POST /booking/check)
+    // (ฟังก์ชันนี้อยู่ประมาณบรรทัด 74)
+    // (ฟังก์ชันนี้อยู่ประมาณบรรทัด 74)
     public function checkTableAvailability(Request $request)
     {
         // 1. ตรวจสอบข้อมูล Input
@@ -116,9 +132,10 @@ class ReservationController extends Controller
             ->get();
 
         // 5. (ใหม่) แยกโต๊ะ (ว่าง / ไม่ว่าง)
-
+        // (เราจะเพิ่ม property 'is_available' เข้าไป)
         $tables = $allTablesInBranch->map(function ($table) use ($bookedTableIds) {
-
+            // โต๊ะนี้จะ "ว่าง" (is_available = true)
+            // ก็ต่อเมื่อ ID ของมัน "ไม่" อยู่ในลิสต์ $bookedTableIds
             $table->is_available = !$bookedTableIds->contains($table->table_id);
             return $table;
         });
@@ -130,10 +147,10 @@ class ReservationController extends Controller
             'selectedBranch' => $selectedBranch,
             'tables' => $tables,
             'userInput' => [ // (ส่งค่าที่ User กรอกกลับไปด้วย)
-            'branch_id' => (int)$branchId,
-            'date' => $selectedDate,
-            'time' => $selectedTime,
-            'duration' => $duration
+                'branch_id' => (int)$branchId,
+                'date' => $selectedDate,
+                'time' => $selectedTime,
+                'duration' => $duration
             ]
         ];
 
