@@ -28,6 +28,13 @@ class ReservationController extends Controller
             // (เพิ่ม) ส่ง $branchId ไปด้วย (สำหรับ Form)
             $viewData['branchId'] = $branchId; 
 
+            // (เพิ่ม) ดึงค่าที่ user input จาก session มาใช้
+            // เพื่อให้ form แสดงค่าที่ user เลือกค้างไว้
+            $userInput = $viewData['userInput'] ?? null;
+            $date = $userInput['date'] ?? null;
+            $startTime = $userInput['time'] ?? null;
+            $duration = $userInput['duration'] ?? null;
+
             // (เพิ่ม) ถ้าผู้ใช้ส่ง selectedBranch มา ให้ตั้งชื่อสาขาให้ view ใช้งานได้
             if (isset($viewData['selectedBranch']) && is_object($viewData['selectedBranch'])) {
                 $viewData['branchName'] = $viewData['selectedBranch']->branch_name ?? null;
@@ -41,10 +48,17 @@ class ReservationController extends Controller
                 $viewData['tables'] = collect($viewData['tables']);
             }
             
+            // (*** เพิ่มส่วนนี้ ***) 
+            // ส่งค่า date, startTime, duration กลับไปที่ view 
+            // เพื่อให้ dropdown แสดงค่าที่ user เลือกไว้
+            $viewData['date'] = $date;
+            $viewData['startTime'] = $startTime;
+            $viewData['duration'] = $duration;
+            
             return view('booking.table', $viewData);
         }
 
-        // --- (แก้ไขส่วนนี้) ---
+        // --- (นี่คือส่วนที่แก้ไขใหม่ทั้งหมด) ---
         // 2. ถ้าไม่มี (คือการโหลดหน้าครั้งแรกปกติ)
         
         // 2a. ค้นหาสาขาทั้งหมด และสาขาที่เลือก
@@ -56,30 +70,71 @@ class ReservationController extends Controller
           $branchId = $selectedBranch->branch_id; 
         }
         
-        // 2b. (เพิ่ม) ค้นหาโต๊ะทั้งหมดในสาขานั้น
-        $tablesInBranch = DB::table('tables')
+        // 2b. (ใหม่) กำหนดค่าเริ่มต้นสำหรับ Date, Time, Duration
+        // เราจะใช้ค่าเหล่านี้เพื่อเช็คสถานะโต๊ะทันที
+        $selectedDate = date('Y-m-d');
+        // (เราจะปัดเวลาเป็นชั่วโมงเต็มที่ใกล้ที่สุด เพื่อง่ายต่อการแสดงผลเริ่มต้น)
+        $selectedTime = date('H:00'); 
+        $duration = 60; // (60 นาที)
+
+        // 2c. (ใหม่) คำนวณช่วงเวลา (ยกโลจิกมาจาก checkTableAvailability)
+        try {
+            $userStartTime = Carbon::parse($selectedDate . ' ' . $selectedTime);
+            $userEndTime = $userStartTime->copy()->addMinutes($duration);
+        } catch (\Exception $e) {
+            // (กรณีนี้ไม่ควรเกิด แต่กันไว้)
+            $userStartTime = now();
+            $userEndTime = now()->addMinutes($duration);
+        }
+
+        // 2d. (ใหม่) ค้นหา "ID โต๊ะ" ที่ "ถูกจองแล้ว" (ยกโลจิกมาจาก checkTableAvailability)
+        $bookedTableIds = DB::table('reservation')
+            ->join('orders', 'reservation.order_id', '=', 'orders.order_id')
+            ->join('tables', 'reservation.table_id', '=', 'tables.table_id') // (Join tables เพื่อเอา branch_id)
+            ->where('tables.branch_id', $branchId) // (เช็คสาขาจาก tables)
+            ->whereIn('orders.order_status', ['pending', 'confirmed', 'completed']) 
+            ->where(function ($query) use ($userStartTime, $userEndTime) {
+                // ตรรกะคือ: (เวลาเริ่มจอง < เวลาจบของเรา) AND (เวลาจบจอง > เวลาเริ่มของเรา)
+                $query->where('reservation.start_time', '<', $userEndTime)
+                      ->where('reservation.end_time', '>', $userStartTime);
+            })
+            ->pluck('reservation.table_id')
+            ->unique();
+
+        // 2e. (ใหม่) ค้นหาโต๊ะทั้งหมดในสาขานั้น
+        $allTablesInBranch = DB::table('tables')
                             ->where('branch_id', $selectedBranch->branch_id)
                             ->get();
 
-        // 2c. ตั้งค่าสถานะเริ่มต้นให้โต๊ะทั้งหมด (แก้ Bug)
-        $tablesWithStatus = $tablesInBranch->map(function ($table) {
-            $table->is_available = true; // (เพิ่ม property ที่หายไป)
+        // 2f. (ใหม่) ตั้งค่าสถานะโต๊ะตามจริง
+        $tablesWithStatus = $allTablesInBranch->map(function ($table) use ($bookedTableIds) {
+            // โต๊ะนี้จะ "ว่าง" (is_available = true)
+            // ก็ต่อเมื่อ ID ของมัน "ไม่" อยู่ในลิสต์ $bookedTableIds
+            $table->is_available = !$bookedTableIds->contains($table->table_id);
             return $table;
         });
+
 
         // 3. (แก้ไข) ส่งข้อมูลไปที่ View
         return view('booking.table', [
             'branches' => $branches,
             'selectedBranch' => $selectedBranch,
-            'tables' => $tablesWithStatus, 
-            'userInput' => null,
+            'branchName' => $selectedBranch->branch_name, // (เพิ่ม)
+            'tables' => $tablesWithStatus, // (ใช้ตัวแปรใหม่ที่ตรวจสอบแล้ว)
+            'userInput' => null, // (เพราะเป็นการโหลดครั้งแรก)
             
             // --- (เพิ่มบรรทัดนี้ที่หายไป) ---
-            'branchId' => $branchId 
+            'branchId' => $branchId,
+
+            // (*** เพิ่มส่วนนี้ ***) 
+            // ส่งค่าเริ่มต้นที่เราใช้ค้นหาไปที่ view ด้วย
+            // เพื่อให้ dropdown แสดงค่าเริ่มต้นที่ถูกต้อง
+            'date' => $selectedDate,
+            'startTime' => $selectedTime,
+            'duration' => $duration
         ]);
     }
     // ฟังก์ชันหลัก: ตรวจสอบสถานะโต๊ะและแสดงผล (POST /booking/check)
-    // (ฟังก์ชันนี้อยู่ประมาณบรรทัด 74)
     // (ฟังก์ชันนี้อยู่ประมาณบรรทัด 74)
     public function checkTableAvailability(Request $request)
     {
@@ -87,13 +142,13 @@ class ReservationController extends Controller
         $request->validate([
             'branch_id' => 'required|integer|exists:branches,branch_id',
             'date' => 'required|date|after_or_equal:today',
-            'time' => 'required|date_format:H:i', // (ต้องเป็น H:i เช่น 14:00)
-            'duration' => 'required|integer|min:30', // (เช่น 120 นาที)
+            'start_time' => 'required|date_format:H:i',
+            'duration' => 'required|integer|min:30',
         ]);
 
         $branchId = $request->input('branch_id');
         $selectedDate = $request->input('date'); // (Y-m-d)
-        $selectedTime = $request->input('time'); // (H:i)
+        $selectedTime = $request->input('start_time'); // (H:i)
         $duration = (int)$request->input('duration');
 
         // 2. (ใหม่) คำนวณช่วงเวลาที่ User ต้องการจอง
@@ -104,6 +159,9 @@ class ReservationController extends Controller
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['time' => 'รูปแบบเวลาไม่ถูกต้อง']);
         }
+        if ($userStartTime->lt(Carbon::now())) { 
+        return back()->withInput()->withErrors(['start_time' => 'ไม่สามารถจองในเวลาที่ผ่านมาได้ (เวลาปัจจุบันคือ ' . Carbon::now()->format('H:i') . ' น.)']);
+        }       
 
         // 3. (ใหม่) ค้นหา "ID โต๊ะ" ที่ "ถูกจองแล้ว" ใน "ช่วงเวลานั้น"
         $bookedTableIds = DB::table('reservation')
@@ -140,6 +198,36 @@ class ReservationController extends Controller
             return $table;
         });
 
+        // 5.1 (ใหม่) คำนวณเวลาสิ้นสุดสำหรับแต่ละโต๊ะ
+        $selectedBranch = DB::table('branches')->where('branch_id', $branchId)->first();
+        if (!$selectedBranch) {
+            return back()->withInput()->withErrors(['branch_id' => 'ไม่พบข้อมูลสาขา']);
+        }
+
+        $closeTimeStr = $selectedBranch->time_close; // เช่น "01:00:00"
+
+        // 2. คำนวณเวลาปิดร้านที่แน่นอน (รวมวันที่)
+        // เราต้องจัดการกรณีที่เวลาปิดข้ามวัน (เช่น 01:00 น. ของวันถัดไป)
+        $closeDate = Carbon::parse($selectedDate . ' ' . $closeTimeStr);
+        $openTimeStr = $selectedBranch->time_open;
+
+        // หากเวลาปิด (HH:MM) น้อยกว่าเวลาเปิดร้าน (HH:MM) แสดงว่าปิดข้ามวัน
+        if (Carbon::parse($closeTimeStr)->lt(Carbon::parse($openTimeStr))) {
+            // หากเวลาสิ้นสุด (userEndTime) ตกอยู่ในช่วงวันถัดไป
+            if ($userEndTime->gt($closeDate->copy()->subDay())) {
+                $closeDate->addDay();
+            }
+        }
+
+        // 3. ตรวจสอบว่าเวลาสิ้นสุดของผู้ใช้เกินเวลาปิดร้านหรือไม่
+        if ($userEndTime->gt($closeDate)) {
+            return back()->withInput()->withErrors(['duration' => "ระยะเวลาที่เลือกเกินเวลาปิดทำการของร้าน ({$closeTimeStr} น.) กรุณาลดระยะเวลา"]);
+        }
+        // *** จบการเพิ่มโค้ดตรวจสอบเวลาปิดร้าน ***
+
+        // 4. (ส่วนเดิม) ค้นหา "ID โต๊ะ" ที่ "ถูกจองแล้ว" ใน "ช่วงเวลานั้น"
+        $bookedTableIds = DB::table('reservation');
+
         // 6. (แก้ไข) ส่งข้อมูลผลลัพธ์กลับไป
         $selectedBranch = DB::table('branches')->where('branch_id', $branchId)->first();
         
@@ -149,14 +237,14 @@ class ReservationController extends Controller
             'userInput' => [ // (ส่งค่าที่ User กรอกกลับไปด้วย)
                 'branch_id' => (int)$branchId,
                 'date' => $selectedDate,
-                'time' => $selectedTime,
+                'start_time' => $selectedTime,
                 'duration' => $duration
             ]
         ];
 
         // 7. (แก้ไข) ส่งผลลัพธ์กลับไปที่หน้าเดิม
-        return redirect()->route('booking.form', ['branchId' => $branchId])
-                         ->with('search_results', $results);
+        return redirect()->route('booking.table', ['branchId' => $branchId])
+                 ->with('search_results', $results);
     }
     public function reserveBooking(Request $request) 
     {

@@ -54,8 +54,8 @@
                     <input type="hidden" name="branch_id" value="{{ $selectedBranchId }}">
 
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <label for="quantity-{{ $item->menu_id }}" style="white-space: nowrap;">จำนวน:</label>
-                        <input type="number" id="quantity-{{ $item->menu_id }}" name="quantity" value="1" min="1"
+                        <label for="menu_qty-{{ $item->menu_id }}" style="white-space: nowrap;">จำนวน:</label>
+                        <input type="number" id="menu_qty-{{ $item->menu_id }}" name="menu_qty" value="1" min="1"
                             style="width: 100%; border: 1px solid #ccc; border-radius: 5px; padding: 5px;">
                     </div>
 

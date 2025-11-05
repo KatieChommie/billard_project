@@ -4,7 +4,7 @@
 <section class='hero-section'>
     <h1>Let's Billiard!</h1>
 
-    <p>เราเป็นบริการจองโต๊ะบิลเลียดทั่วอาณาบริเวณเทคโน ฯ ลาดกระบัง</p>
+    <p style='text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);'>เราเป็นบริการจองโต๊ะบิลเลียดทั่วอาณาบริเวณเทคโน ฯ ลาดกระบัง</p>
 
     <div class = 'services'>
         <h2>เราทำอะไรได้บ้าง</h2>
@@ -32,9 +32,8 @@
                 @forelse ($reviews as $review)
                     <div class="review-item" style="background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
                         <div class="review-header" style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="font-weight: bold;">
+                            <h4 style="font-weight: 400; color: #106e27;">
                                 {{ $review->username }} 
-                                {{-- (ตอนนี้ $review->branch_name ใช้ได้แล้ว!) --}}
                                 <span style="font-weight: normal; color: #555;">(สาขา: {{ $review->branch_name }})</span>
                             </h4>
                             <span class="rating" style="font-size: 1.2rem; color: #facc15;">
@@ -56,11 +55,6 @@
                 @endforelse
 
             </div>
-
-            {{-- (ปุ่มนี้จะลิงก์ไปหน้า Dashboard เพื่อให้ User เขียนรีวิว) --}}
-            <a href="{{ route('user.dashboard') }}" class="button" style="display: block; width: 200px; margin: 2rem auto 0; text-align: center; text-decoration: none;">
-                ไปที่ Dashboard เพื่อเขียนรีวิว
-            </a>
             
     </section>
     

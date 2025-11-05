@@ -217,18 +217,18 @@ footer {
     padding-top: var(--header-height);
     color: white;
     text-align: center;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
-    
 }
 
 .hero-section h1{
     font-weight: 600;
     text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
 }
 
 .services{
     margin: 40px 20px;
     text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
 }
 
 .hero-section .li-of-services ul {

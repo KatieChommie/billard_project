@@ -67,7 +67,7 @@ class DashboardController extends Controller
             ->where('r.user_id', $userId)
             ->select(
                 'r.rating',
-                'r.review_descrpt', // (ใช้ชื่อคอลัมน์จริง)
+                'r.review_descrpt',
                 'r.created_at',
                 DB::raw("COALESCE(b.branch_name, 'สั่งกลับบ้าน/ไม่ระบุ') as branch_name")
             )

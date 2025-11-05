@@ -45,25 +45,25 @@
                 <div class="input-group-booking">
                     <label for="date">Date*</label>
                     {{-- ใช้ค่า old() หรือค่าจาก Controller --}}
-              <input type="date" id="date" name="date" required 
-                  value="{{ old('date', $date ?? date('Y-m-d', strtotime($startTime ?? 'now'))) }}">
+                    <input type="date" id="date" name="date" required 
+                        value="{{ old('date', $date ?? date('Y-m-d', strtotime($startTime ?? 'now'))) }}"
+                        min="{{ date('Y-m-d') }}">
                 </div>
                 
                 {{-- 2.3 Start Time Selector --}}
                 <div class="input-group-booking">
                     <label for="start_time">Start time*</label>
                     <select id="start_time_select" name="start_time" required>
-                        @for ($h = 9; $h < 24; $h++)
-                            @foreach ([0, 30] as $m)
-                                @php $time = sprintf('%02d:%02d', $h, $m); @endphp
-                                <option value="{{ $time }}" 
-                                    {{ old('start_time', date('H:i')) == $time ? 'selected' : '' }}>
-                                    {{ $time }}
-                                </option>
-                            @endforeach
-                        @endfor
                     </select>
                 </div>
+
+                @if (old('start_time'))
+                    <input type="hidden" id="old_start_time" value="{{ old('start_time') }}">
+                @elseif (isset($startTime))
+                    <input type="hidden" id="old_start_time" value="{{ $startTime }}">
+                @else
+                    <input type="hidden" id="old_start_time" value="">
+                @endif
 
                 {{-- 2.4 Duration Selector --}}
                 <div class="input-group-booking">
@@ -183,62 +183,113 @@
     }
 
     function updateSummary() {
-        const numTables = selectedTables.size;
-        const totalPrice = calculatePrice(numTables);
+    const numTables = selectedTables.size;
+    const totalPrice = calculatePrice(numTables);
+    
+    document.getElementById('selected-table-ids').value = Array.from(selectedTables).join(',');
+    document.getElementById('selected-table-count').textContent = numTables;
+    document.getElementById('final-price').textContent = totalPrice.toFixed(2);
+    
+    // Update start / end display + hidden inputs
+    const dateInput = document.getElementById('date');
+    const timeSelect = document.getElementById('start_time_select');
+    const durationSelect = document.getElementById('duration_select');
+    const branchSelect = document.getElementById('branch_id_select');
+
+    const displayStartEl = document.getElementById('display-start-time');
+    const displayEndEl = document.getElementById('display-end-time');
+    const displayDurationEl = document.getElementById('display-duration');
+
+    const hiddenStart = document.getElementById('hidden-start-time');
+    const hiddenEnd = document.getElementById('hidden-end-time');
+    const hiddenDuration = document.getElementById('hidden-duration');
+
+    let displayStart = '--';
+    let displayEnd = '--';
+    let durationMinutes = durationSelect ? parseInt(durationSelect.value, 10) : (hiddenDuration ? parseInt(hiddenDuration.value, 10) : 60);
+
+    // *** Logic ตรวจสอบเวลาเปิด-ปิดร้าน (Branch Hours) ***
+    const selectedBranchId = branchSelect ? branchSelect.value : null;
+    let isOverClosingTime = false;
+    
+    if (displayDurationEl) displayDurationEl.textContent = durationMinutes;
+
+    if (dateInput && timeSelect && dateInput.value && timeSelect.value) {
         
-        document.getElementById('selected-table-ids').value = Array.from(selectedTables).join(',');
-        document.getElementById('selected-table-count').textContent = numTables;
-        document.getElementById('final-price').textContent = totalPrice.toFixed(2);
+        // 1. คำนวณเวลาเริ่มต้น
+        // ใช้ YYYY-MM-DDTHH:MM:SS เพื่อให้ Date Object จัดการ Timezone ได้อย่างแม่นยำ
+        const startString = `${dateInput.value}T${timeSelect.value}:00`;
+        const startDate = new Date(startString);
         
-        // Update start / end display + hidden inputs
-        const dateInput = document.getElementById('date');
-        const timeSelect = document.getElementById('start_time_select');
-        const durationSelect = document.getElementById('duration_select');
+        if (!isNaN(startDate)) {
+            // 1a. คำนวณเวลาสิ้นสุดที่ถูกต้อง (บวกมิลลิวินาที)
+            const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
+            
+            // 2. ตรวจสอบเวลาปิดร้าน
+            if (selectedBranchId && branchHoursMap[selectedBranchId]) {
+                const branchHours = branchHoursMap[selectedBranchId];
+                const closeTimeStr = branchHours.close; // เช่น "23:00" หรือ "02:00"
+                const openTimeStr = branchHours.open; 
+                
+                const closeTimeHours = parseInt(closeTimeStr.substring(0, 2));
+                const openTimeHours = parseInt(openTimeStr.substring(0, 2));
 
-        const displayStartEl = document.getElementById('display-start-time');
-        const displayEndEl = document.getElementById('display-end-time');
-        const displayDurationEl = document.getElementById('display-duration');
+                // 2a. สร้าง CloseDate ฐาน: เวลาปิดของวันที่เริ่มต้น
+                let closeDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 
+                                           closeTimeHours, 
+                                           parseInt(closeTimeStr.substring(3, 5)), 0, 0);
 
-        const hiddenStart = document.getElementById('hidden-start-time');
-        const hiddenEnd = document.getElementById('hidden-end-time');
-        const hiddenDuration = document.getElementById('hidden-duration');
-
-        let displayStart = '--';
-        let displayEnd = '--';
-        let durationMinutes = durationSelect ? parseInt(durationSelect.value, 10) : (hiddenDuration ? parseInt(hiddenDuration.value, 10) : 60);
-
-        if (displayDurationEl) displayDurationEl.textContent = durationMinutes;
-
-        if (dateInput && timeSelect && dateInput.value && timeSelect.value) {
-            // Build local date-time from date input and time select
-            const startString = `${dateInput.value}T${timeSelect.value}:00`;
-            const startDate = new Date(startString);
-            if (!isNaN(startDate)) {
-                const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
-
-                // Clamp end to same calendar day as start (set to 23:59 if overflow)
-                if (endDate.getDate() !== startDate.getDate()) {
-                    endDate.setHours(23, 59, 0, 0);
+                // *** NEW LOGIC: จัดการ CloseDate สำหรับสาขาที่ปิดข้ามวัน ***
+                if (closeTimeHours < openTimeHours) {
+                    // สาขาที่ปิดข้ามวัน (เช่น ปิด 02:00 น. โดยเปิด 10:00 น.)
+                    
+                    // ถ้าเวลาเริ่มต้น (startDate.getHours()) ยังไม่ถึงเวลาเปิดร้าน (openTimeHours) 
+                    // แสดงว่าการจองนั้นอยู่ในช่วงเช้าของวันทำการเมื่อวาน (เช่น 01:00 น.)
+                    if (startDate.getHours() < openTimeHours) {
+                        // CloseDate ที่สร้างไว้ (02:00 น. ของวันนี้) ถือว่าถูกต้องแล้ว
+                    } else {
+                        // ถ้าเวลาเริ่มต้นอยู่ในช่วงเวลาเปิด (เช่น 23:00 น. ของวันนี้) 
+                        // CloseDate ต้องเป็น 02:00 น. ของวันถัดไป
+                        closeDate.setDate(closeDate.getDate() + 1);
+                    }
+                } else {
+                    // สาขาที่ปิดก่อนเที่ยงคืน (เช่น ปิด 23:00 น.)
+                    // Logic นี้จะทำให้ CloseDate ยึดวันที่ startDate ไว้เสมอ ซึ่งถูกต้อง
                 }
-
-                const pad = (n) => String(n).padStart(2, '0');
-                const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
-                displayStart = fmt(startDate);
-                displayEnd = fmt(endDate);
-
-                if (hiddenStart) hiddenStart.value = `${displayStart}:00`;
-                if (hiddenEnd) hiddenEnd.value = `${displayEnd}:00`;
-                if (hiddenDuration) hiddenDuration.value = durationMinutes;
+                
+                // 2c. ตรวจสอบว่าเวลาสิ้นสุด "เกิน" เวลาปิดร้านหรือไม่
+                // เปรียบเทียบ End Time ที่คำนวณ กับ Close Date ที่ปรับแล้ว
+                if (endDate.getTime() > closeDate.getTime()) {
+                     isOverClosingTime = true;
+                }
             }
+            
+            // 3. จัดรูปแบบการแสดงผล
+            const pad = (n) => String(n).padStart(2, '0');
+            const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+            displayStart = fmt(startDate);
+            displayEnd = fmt(endDate); // แสดงผลเวลาสิ้นสุดที่ถูกต้อง
+
+            if (hiddenStart) hiddenStart.value = `${displayStart}:00`;
+            if (hiddenEnd) hiddenEnd.value = `${displayEnd}:00`;
+            if (hiddenDuration) hiddenDuration.value = durationMinutes;
         }
+    }
 
-        if (displayStartEl) displayStartEl.textContent = displayStart;
-        if (displayEndEl) displayEndEl.textContent = displayEnd;
+    if (displayStartEl) displayStartEl.textContent = displayStart;
+    
+    // *** Logic การแสดงผลและการ Disable ปุ่มเมื่อจองเกินเวลาปิด ***
+    const summary = document.getElementById('price-summary');
+    const confirmBtn = document.querySelector('.confirm-booking-btn');
 
-        const summary = document.getElementById('price-summary');
-        const confirmBtn = document.querySelector('.confirm-booking-btn');
-
+    if (isOverClosingTime) {
+        displayEnd = 'EXCEEDS CLOSING TIME';
+        summary.classList.remove('hidden'); 
+        if (confirmBtn) confirmBtn.disabled = true;
+        summary.classList.add('text-red-500'); 
+    } else {
+        summary.classList.remove('text-red-500'); 
         if (numTables > 0) {
             summary.classList.remove('hidden');
             if (confirmBtn) confirmBtn.disabled = false;
@@ -247,7 +298,9 @@
             if (confirmBtn) confirmBtn.disabled = true;
         }
     }
-
+    
+    if (displayEndEl) displayEndEl.textContent = displayEnd;
+}
     function toggleTableSelection(button) {
         const tableId = button.getAttribute('data-table-id');
         
@@ -294,10 +347,28 @@
 
         let currentTime = new Date(openTime);
 
+        const selectedDateInput = document.getElementById('date');
+        const selectedDate = selectedDateInput ? selectedDateInput.value : '';
+        const todayDate = '{{ date('Y-m-d') }}';
+        const isToday = selectedDate === todayDate;
+        const now = new Date();
+
         while (currentTime < closeTime) {
             const hour = String(currentTime.getHours()).padStart(2, '0');
             const minute = String(currentTime.getMinutes()).padStart(2, '0');
             const timeString = `${hour}:${minute}`;
+
+            if (isToday) {
+            // สร้างวัตถุ Date สำหรับช่วงเวลาปัจจุบัน (ของวันนี้)
+            const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentTime.getHours(), currentTime.getMinutes(), 0, 0);
+
+            // หากเวลานั้น (slotTime) น้อยกว่าเวลาปัจจุบัน (ให้เผื่อไป 30 นาที) 
+            // เช่น ตอนนี้ 22:24 น. จะไม่สามารถจอง 22:30 น. ได้ทันที แต่จะเริ่มที่ 23:00 น.
+            if (slotTime.getTime() < (now.getTime() + 30 * 60000)) { 
+                currentTime.setMinutes(currentTime.getMinutes() + 30);
+                continue; 
+            }
+        }
 
             const option = new Option(timeString, timeString);
             timeSelectElement.add(option);
@@ -306,9 +377,20 @@
         }
 
         // ตั้งค่าเวลาที่ผู้ใช้เลือกไว้ (ถ้ามี)
-        const previouslySelectedTime = '{{ $startTime ?? '' }}';
+        const oldStartTimeInput = document.getElementById('old_start_time');
+        let previouslySelectedTime = oldStartTimeInput ? oldStartTimeInput.value : '';
+
+        if (!previouslySelectedTime) {
+            // ดึงค่าจาก Controller (สำหรับการโหลดหน้าครั้งแรกที่สำเร็จ)
+            previouslySelectedTime = '{{ $startTime ?? '' }}'; 
+        }
+
         if (previouslySelectedTime) {
+            // *** ใช้ previouslySelectedTime ที่ได้จาก old() หรือ $startTime ***
             timeSelectElement.value = previouslySelectedTime;
+        } else {
+            // Fallback: ตั้งค่าเป็นเวลาปัจจุบัน (ชั่วโมงเต็ม) หากไม่มีค่าใดๆ
+            timeSelectElement.value = "{{ date('H:00') }}";
         }
     }
 
@@ -339,6 +421,17 @@
         // 3b. ดักฟังการ "เปลี่ยนสาขา"
         if (branchSelect) {
             branchSelect.addEventListener('change', handleBranchChange);
+        }
+
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            dateInput.addEventListener('change', function() {
+                // A. อัปเดต UI dropdown (กรองเวลาที่ผ่านมาถ้าเป็นวันนี้)
+                populateTimeOptions(branchSelect.value, timeSelect); 
+
+                // B. ส่งฟอร์มเพื่อค้นหาสถานะโต๊ะใหม่ (เพราะสถานะโต๊ะขึ้นอยู่กับวันที่)
+                document.getElementById('time-selection-form').submit();
+            });
         }
 
         // 3c. ดักฟังการ "เปลี่ยนระยะเวลา" (เพื่อคำนวณราคาใหม่)
