@@ -27,10 +27,12 @@ class CancelExpiredOrders extends Command
      */
     public function handle()
     {
-        $this->info('Checking for expired orders...'); // (ข้อความไว้ดูตอนเทส)
-        
-        // 1. กำหนดเวลาหมดอายุ (เช่น 1 ชั่วโมง)
-        $expirationTime = Carbon::now()->subHours(1);
+    $this->info('Checking for expired orders...'); // (ข้อความไว้ดูตอนเทส)
+
+    // 1. กำหนดเวลาหมดอายุ (ค่าอ่านจาก config หรือ default = 2 ชั่วโมง)
+    $expirationHours = config('orders.expiration_hours', 2);
+    $this->info("Using expiration window: {$expirationHours} hour(s)");
+    $expirationTime = Carbon::now()->subHours($expirationHours);
 
         // 2. ค้นหา Orders ที่ "pending" และ "เก่าเกิน 1 ชั่วโมง"
         $expiredOrders = DB::table('orders')

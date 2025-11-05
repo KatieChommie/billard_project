@@ -33,10 +33,10 @@
             @endforeach
         </div>
     @endif
-    
-    
-    <h2 class="admin-section-title" style="margin-top: 2rem;">รายการจองที่รอการเสร็จสิ้น (Confirmed)</h2>
-    
+
+
+    <h2 class="admin-section-title" style="margin-top: 2rem;">รายการจองที่รอเสร็จสิ้น (Confirmed)</h2>
+
     <div class="widget">
         
         <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">

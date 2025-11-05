@@ -32,7 +32,7 @@ class DashboardController extends Controller
             ->leftJoin('tables as t', 'res.table_id', '=', 't.table_id')
             ->leftJoin('branches as b', 't.branch_id', '=', 'b.branch_id')
             ->where('o.user_id', $userId)
-            ->whereIn('o.order_status', ['pending', 'confirmed', 'cancelled'])
+            ->whereIn('o.order_status', ['pending', 'confirmed', 'completed', 'cancelled'])
             ->select(
                 'o.order_id',
                 'o.order_status',
@@ -40,11 +40,13 @@ class DashboardController extends Controller
                 DB::raw('COALESCE(res.start_time, o.order_date) as display_time'),
                 DB::raw('COUNT(DISTINCT res.order_id) > 0 as has_table'),
                 DB::raw('COUNT(DISTINCT pur.purchase_id) > 0 as has_food'),
-                'b.branch_id' 
+                'b.branch_id',
+                DB::raw("COALESCE(b.branch_name, 'N/A') as branch_name")
+
             )
             ->groupBy( 
                 'o.order_id', 'o.order_status', 'p.final_amount', 'o.order_date',
-                'res.start_time', 'b.branch_id'
+                'res.start_time', 'b.branch_id', 'b.branch_name'
             ) 
             ->orderBy('display_time', 'desc')
             ->get();

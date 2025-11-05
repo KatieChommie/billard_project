@@ -40,8 +40,8 @@ class CartController extends Controller
     {
         $request->validate([ /* ... (validation เดิม) ... */
             'menu_id' => 'required|integer|exists:menus,menu_id',
-            'quantity' => 'required|integer|min:1',
-            'name' => 'required|string',
+            'menu_qty' => 'required|integer|min:1',
+            'menu_name' => 'required|string',
             'price' => 'required|numeric',
             'branch_id' => 'required|integer|exists:branches,branch_id',
         ]);
@@ -63,8 +63,8 @@ class CartController extends Controller
             $cartFood[$menuId]['quantity'] += $request->quantity;
         } else {
             $cartFood[$menuId] = [
-                "name" => $request->name,
-                "quantity" => (int)$request->quantity,
+                "menu_name" => $request->menu_name,
+                "menu_qty" => (int)$request->menu_qty,
                 "price" => $request->price,
                 "branch_id" => $branchId,
             ];
@@ -130,7 +130,6 @@ class CartController extends Controller
             $newOrderId = null; 
             DB::transaction(function () use ($cartTable, $cartFood, $userId, $totalAmount, &$newOrderId) {
                 
-                // 1. สร้าง 1 Order
                 $orderId = DB::table('orders')->insertGetId([
                     'user_id' => $userId,
                     'order_date' => now(),
@@ -138,7 +137,6 @@ class CartController extends Controller
                 ]);
                 $newOrderId = $orderId;
 
-                // 2. (ใหม่) บันทึก Reservation (ถ้ามี)
                 if ($cartTable) {
                     $reservationItems = [];
                     foreach ($cartTable['table_ids'] as $tableId) {
@@ -147,13 +145,12 @@ class CartController extends Controller
                             'table_id' => $tableId,
                             'start_time' => $cartTable['start_time'],
                             'end_time' => $cartTable['end_time'],
-                            'reserve_status' => 'confirmed', // (สถานะของ *โต๊ะ* คือ confirmed)
+                            'reserve_status' => 'confirmed', 
                         ];
                     }
                     DB::table('reservation')->insert($reservationItems);
                 }
 
-                // 3. บันทึก Purchase (ถ้ามี)
                 if (!empty($cartFood)) {
                     $purchaseItems = [];
                     foreach ($cartFood as $id => $details) {
@@ -168,7 +165,15 @@ class CartController extends Controller
                     DB::table('purchase')->insert($purchaseItems);
                 }
 
-                // 4. สร้าง 1 Payment (ยอดรวม)
+                
+                // Decrement stock in inventory: inventory column is `stock_qty` and inventory is per-branch
+                foreach ($purchaseItems as $item) {
+                    DB::table('inventory')
+                        ->where('menu_id', $item['menu_id'])
+                        ->where('branch_id', $item['branch_id'])
+                        ->decrement('stock_qty', $item['menu_qty']);
+                }
+
                 DB::table('payment')->insert([
                     'order_id' => $orderId,
                     'total_amount' => $totalAmount,

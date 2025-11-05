@@ -68,16 +68,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [DashboardController::class, 'index'])
          ->middleware(['verified']) 
          ->name('user.dashboard');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/admin/bookings/complete/{order_id}', [AdminController::class, 'markAsCompleted'])
+     ->name('admin.bookings.complete');
     Route::post('/dashboard/cancel-booking', [DashboardController::class, 'cancelBooking'])
          ->name('dashboard.booking.cancel');
 });
 
-Route::delete('/profile', [ProfileController::class, 'destroy'])
-    ->middleware(['auth', 'password.confirm']) // ใช้ middleware เพื่อยืนยันรหัสผ่านอีกครั้ง
-    ->name('profile.destroy');
 
 /* admin */
 Route::middleware(['auth', 'admin'])->group(function () {

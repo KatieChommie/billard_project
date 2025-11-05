@@ -19,7 +19,7 @@ class ReviewController extends Controller
         $order = DB::table('orders')
                     ->where('order_id', $order_id)
                     ->where('user_id', $userId)
-                    ->where('order_status', 'confirmed')
+                    ->where('order_status', 'completed')
                     ->first();
 
         // (กัน) ถ้าไม่เจอ Order
@@ -70,7 +70,7 @@ class ReviewController extends Controller
         $order = DB::table('orders')
                     ->where('order_id', $orderId)
                     ->where('user_id', $userId)
-                    ->where('order_status', 'confirmed')
+                    ->where('order_status', 'completed')
                     ->first();
         
         if (!$order) {

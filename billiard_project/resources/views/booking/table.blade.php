@@ -94,19 +94,36 @@
                 
                 <div class="table-grid-buttons">
                     @foreach ($tables as $table)
-                        <button 
-                            type="button" 
-        
-                            class="table-btn {{ $table->tailwind_color }}" 
+                        
+                            {{-- (1. เราจะสร้างตัวแปร Logic ที่นี่) --}}
+                            @php
+                                $isAvailable = $table->is_available; // (ตัวแปรใหม่จาก Controller)
+                                
+                                // (สร้างตัวแปรสีและข้อความ)
+                                $colorClass = $isAvailable ? 'bg-green-500 hover:bg-green-400' : 'bg-red-600 cursor-not-allowed';
+                                $statusText = $isAvailable ? 'ว่าง' : 'จองแล้ว';
+                                $isDisabled = !$isAvailable; // (ถ้าไม่ว่าง = true)
+                            @endphp
 
-                            data-table-id="{{ $table->table_id }}"
-                            onclick="toggleTableSelection(this)" 
-        
-                            {{ $table->status_for_user !== 'ว่าง' ? 'disabled' : '' }}>
+                            {{-- (2. นี่คือ <button> ดีไซน์เดิมของคุณ) --}}
+                            <button 
+                                type="button" 
+                            
+                                {{-- (3. ใช้ตัวแปรใหม่ของเรา) --}}
+                                class="table-btn {{ $colorClass }} {{ $isAvailable ? 'table-selectable' : '' }}" 
+
+                                data-table-id="{{ $table->table_id }}"
+                                onclick="toggleTableSelection(this)" 
+                            
+                                {{-- (4. ใช้ตัวแปรใหม่ของเรา) --}}
+                                {{ $isDisabled ? 'disabled' : '' }}>
+                                
                                 <span class="table-name">{{ $table->table_number }}</span>
-                                <span class="status-text">{{ $table->status_for_user }}</span>
-                        </button>
-                    @endforeach
+                                
+                                {{-- (5. ใช้ตัวแปรใหม่ของเรา) --}}
+                                <span class="status-text">{{ $statusText }}</span>
+                            </button>
+                        @endforeach
                 </div>
             </div>
         @endif

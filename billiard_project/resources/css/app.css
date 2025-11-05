@@ -993,6 +993,7 @@ tbody tr:last-child {
 }
 
 td.status-completed,
+td.status-confirmed,
 td.status-upcoming,
 td.status-cancelled {
     
@@ -1016,6 +1017,7 @@ tr:hover {
 
 /* Status Badges */
 .status-completed,
+.status-confirmed,
 .status-upcoming,
 .status-cancelled {
     font-weight: 400;
@@ -1032,6 +1034,10 @@ tr:hover {
     background-color: #4CAF50; 
 }
 
+.status-confirmed {
+    color: white;
+    background-color: #007BFF; 
+}
 .status-upcoming {
     color: #333; 
     background-color: #FFC107; 

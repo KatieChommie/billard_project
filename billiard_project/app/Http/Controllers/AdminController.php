@@ -48,39 +48,18 @@ class AdminController extends Controller
             'ordersToComplete' => $ordersToComplete, // <-- (ส่งตัวแปรใหม่นี้ไป)
         ]);
     }
-public function markAsCompleted(Request $request)
-    {
-        // 1. ตรวจสอบสิทธิ์ (สมมติว่าคุณมี Admin Middleware แล้ว)
-        if (! Auth::check() || Auth::user()->role !== 'admin') {
-            return redirect('/admin/login')->with('error', 'Unauthorized access.');
-        }
 
-        $request->validate([
-            'order_id' => 'required|integer|exists:orders,order_id',
-        ]);
+public function markAsCompleted($order_id)
+{
+    // (กัน Admin กดพลาด)
+    // อนุญาตให้อัปเดตเฉพาะ Order ที่จ่ายเงินแล้ว (confirmed)
+    DB::table('orders')
+        ->where('order_id', $order_id)
+        ->where('order_status', 'confirmed') 
+        ->update(['order_status' => 'completed']);
 
-        $orderId = $request->input('order_id');
-
-        try {
-            DB::transaction(function () use ($orderId) {
-                
-                // 1. อัปเดต Order Status เป็น 'completed'
-                DB::table('orders')
-                    ->where('order_id', $orderId)
-                    ->update(['order_status' => 'completed']);
-                
-                // 2. อัปเดต Reservation Status (ถ้ามี) เป็น 'completed'
-                DB::table('reservation')
-                    ->where('order_id', $orderId)
-                    ->update(['reserve_status' => 'completed']);
-            });
-
-            return back()->with('success', "Order ID #{$orderId} ถูกทำเครื่องหมายว่าเสร็จสิ้นแล้ว!");
-
-        } catch (\Exception $e) {
-            return back()->withErrors(['message' => 'เกิดข้อผิดพลาดในการทำเครื่องหมายเสร็จสิ้น: ' . $e->getMessage()]);
-        }
-    }
+    return back()->with('success', 'Order #' . $order_id . ' marked as completed!');
+}
 
 public function manageUsers(Request $request)
     {

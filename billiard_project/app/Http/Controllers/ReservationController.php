@@ -10,11 +10,11 @@ use Illuminate\Support\Carbon;
 
 class ReservationController extends Controller
 {
-    // ฟังก์ชันสำหรับแสดงหน้าฟอร์มเริ่มต้น (GET /booking/form)
+ 
     // ฟังก์ชันสำหรับแสดงหน้าฟอร์มเริ่มต้น (GET /booking/form/{branchId})
     public function showBookingForm($branchId)
     {
-        // 1. ตรวจสอบว่ามี "ผลลัพธ์จากการค้นหา" (ที่ส่งมาจาก checkTableAvailability) หรือไม่
+        // 1. ตรวจสอบว่ามี \"ผลลัพธ์จากการค้นหา\" (ที่ส่งมาจาก checkTableAvailability) หรือไม่
         if (session()->has('search_results')) {
             
             // 1a. ถ้ามี, ให้ใช้ข้อมูลนั้นแสดงผล
@@ -23,6 +23,9 @@ class ReservationController extends Controller
             
             // ผสานข้อมูลสาขาทั้งหมดเข้าไปใน viewData (เพื่อให้ Dropdown สาขาทำงานได้)
             $viewData['branches'] = $allBranches;
+            
+            // (เพิ่ม) ส่ง $branchId ไปด้วย (สำหรับ Form)
+            $viewData['branchId'] = $branchId; 
             
             return view('booking.table', $viewData);
         }
@@ -35,6 +38,8 @@ class ReservationController extends Controller
         $selectedBranch = $branches->where('branch_id', $branchId)->first();
         if (!$selectedBranch) {
           $selectedBranch = $branches->first();
+          // (สำคัญ) ถ้าสาขาไม่ถูก ให้ใช้ ID ของสาขาแรกแทน
+          $branchId = $selectedBranch->branch_id; 
         }
         
         // 2b. (เพิ่ม) ค้นหาโต๊ะทั้งหมดในสาขานั้น
@@ -42,123 +47,99 @@ class ReservationController extends Controller
                             ->where('branch_id', $selectedBranch->branch_id)
                             ->get();
 
-        // 2c. (เพิ่ม) "แปล" สถานะโต๊ะให้เป็น Tailwind Class (เหมือนใน checkTableAvailability)
-        $tablesInBranch->map(function ($table) {
-            
-            if ($table->table_status === 'available') {
-                $table->tailwind_color = 'bg-green-500 hover:bg-green-400'; 
-                $table->status_for_user = 'ว่าง'; 
-            
-            } elseif ($table->table_status === 'reserved') {
-                $table->tailwind_color = 'bg-red-600 cursor-not-allowed'; 
-                $table->status_for_user = 'จองแล้ว';
-            
-            } else { // (unavailable)
-                $table->tailwind_color = 'bg-gray-500 cursor-not-allowed'; 
-                $table->status_for_user = 'ไม่ว่าง';
-            }
+        // 2c. ตั้งค่าสถานะเริ่มต้นให้โต๊ะทั้งหมด (แก้ Bug)
+        $tablesWithStatus = $tablesInBranch->map(function ($table) {
+            $table->is_available = true; // (เพิ่ม property ที่หายไป)
             return $table;
         });
 
-        // 2d. (แก้ไข) ส่ง $tablesInBranch (ที่มีโต๊ะ) ไปแทน collect()
-        return view('booking.table', [ 
+        // 3. (แก้ไข) ส่งข้อมูลไปที่ View
+        return view('booking.table', [
             'branches' => $branches,
-            'tables' => $tablesInBranch, // <-- $tables ที่ blade คาดหวัง
-            'branchName' => $selectedBranch->branch_name,
-            'branchId' => $selectedBranch->branch_id,
-            'startTime' => null,
-            'duration' => 60,
-            'date' => null, 
-            'endTime' => null, 
-            'checked' => false, // <-- (สำคัญ) เพิ่มตัวแปรนี้เพื่อแก้ Error
+            'selectedBranch' => $selectedBranch,
+            'tables' => $tablesWithStatus, 
+            'userInput' => null,
+            
+            // --- (เพิ่มบรรทัดนี้ที่หายไป) ---
+            'branchId' => $branchId 
         ]);
     }
-
     // ฟังก์ชันหลัก: ตรวจสอบสถานะโต๊ะและแสดงผล (POST /booking/check)
-    public function checkTableAvailability(Request $request) 
+    public function checkTableAvailability(Request $request)
     {
-        // 1. Validation (เหมือนเดิม)
+        // 1. ตรวจสอบข้อมูล Input
         $request->validate([
-            'branch_id' => 'required|integer',
-            'date' => 'required|date_format:Y-m-d',
-            'start_time' => 'required|date_format:H:i',
-            'duration' => 'required|integer|min:30',
+            'branch_id' => 'required|integer|exists:branches,branch_id',
+            'date' => 'required|date|after_or_equal:today',
+            'time' => 'required|date_format:H:i', // (ต้องเป็น H:i เช่น 14:00)
+            'duration' => 'required|integer|min:30', // (เช่น 120 นาที)
         ]);
 
-        // 2. Logic การคำนวณเวลา (เหมือนเดิม)
-        $branchId = $request->branch_id;
-        $date = $request->date;
-        $startTime = $request->start_time;
-        $durationMins = (int) $request->duration;
-        
-        $startTimeCarbon = Carbon::parse($date . ' ' . $startTime);
-        $endTime = $startTimeCarbon->copy()->addMinutes($durationMins);
+        $branchId = $request->input('branch_id');
+        $selectedDate = $request->input('date'); // (Y-m-d)
+        $selectedTime = $request->input('time'); // (H:i)
+        $duration = (int)$request->input('duration');
 
-        $branch = DB::table('branches')->where('branch_id', $branchId)->first();
-        if (!$branch) {
-            return back()->withErrors(['branch_id' => 'ไม่พบสาขาที่เลือก']);
+        // 2. (ใหม่) คำนวณช่วงเวลาที่ User ต้องการจอง
+        try {
+            // (Carbon คือ Library จัดการเวลาของ Laravel)
+            $userStartTime = Carbon::parse($selectedDate . ' ' . $selectedTime);
+            $userEndTime = $userStartTime->copy()->addMinutes($duration);
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['time' => 'รูปแบบเวลาไม่ถูกต้อง']);
         }
-        
-        // (ส่วนโค้ดตรวจสอบเวลาเปิด-ปิดร้าน... หากคุณมี ก็ให้คงไว้)
 
-        // 3. (แก้ไข) Logic การค้นหาโต๊ะ
-        // 3a. ค้นหา "ID โต๊ะที่ติดจอง" ในช่วงเวลานี้
-        $conflictingTableIds = DB::table('reservation')
-            ->join('tables', 'reservation.table_id', '=', 'tables.table_id')
-            ->join('orders', 'reservation.order_id', '=', 'orders.order_id') // (เพิ่ม) ต้องเช็คสถานะ Order
-            ->where('tables.branch_id', $branchId) 
-            ->whereIn('orders.order_status', ['pending', 'confirmed']) // (เพิ่ม) เอาเฉพาะ Order ที่ยัง Active
-            ->where('reservation.start_time', '<', $endTime)
-            ->where('reservation.end_time', '>', $startTimeCarbon)
+        // 3. (ใหม่) ค้นหา "ID โต๊ะ" ที่ "ถูกจองแล้ว" ใน "ช่วงเวลานั้น"
+        $bookedTableIds = DB::table('reservation')
+            ->join('orders', 'reservation.order_id', '=', 'orders.order_id')
+            ->join('tables', 'reservation.table_id', '=', 'tables.table_id') // (Join tables เพื่อเอา branch_id)
+            ->where('tables.branch_id', $branchId) // (เช็คสาขาจาก tables)
+            
+            // (สำคัญ) เช็คสถานะที่ยัง Active หรือเพิ่งเล่นจบ
+            ->whereIn('orders.order_status', ['pending', 'confirmed', 'completed']) 
+            
+            // --- นี่คือ Logic ใหม่ที่แก้ไข Bug (Time Overlap) ---
+            ->where(function ($query) use ($userStartTime, $userEndTime) {
+                // ตรรกะคือ: (เวลาเริ่มจอง < เวลาจบของเรา) AND (เวลาจบจอง > เวลาเริ่มของเรา)
+                // มันจะจับทุกการจองที่คาบเกี่ยวกัน
+                $query->where('reservation.start_time', '<', $userEndTime)
+                      ->where('reservation.end_time', '>', $userStartTime);
+            })
+            // --- จบ Logic ใหม่ ---
+            
             ->pluck('reservation.table_id')
-            ->unique(); // (เอา ID โต๊ะที่ติดจอง)
-        
-        // 3b. (แก้ไข) ดึงโต๊ะ "ทั้งหมด" ในสาขานี้
+            ->unique();
+
+        // 4. ค้นหาโต๊ะทั้งหมดในสาขานั้น
         $allTablesInBranch = DB::table('tables')
             ->where('branch_id', $branchId)
             ->get();
 
-        // 3c. (ใหม่) วน Loop โต๊ะทั้งหมด เพื่อ "ปั๊มสถานะ"
-        $tablesWithStatus = $allTablesInBranch->map(function ($table) use ($conflictingTableIds) {
-            
-            // ตรวจสอบว่า ID โต๊ะนี้ อยู่ในลิสต์ "ติดจอง" (conflicting) หรือไม่
-            if ($conflictingTableIds->contains($table->table_id)) {
-                
-                // ---- นี่คือโต๊ะที่ "จองแล้ว" (ในช่วงเวลานี้) ----
-                $table->tailwind_color = 'bg-red-600 cursor-not-allowed'; 
-                $table->status_for_user = 'จองแล้ว';
-            
-            } else {
-                // ---- นี่คือโต๊ะที่ "ว่าง" (ในช่วงเวลานี้) ----
-                // แต่ต้องเช็คสถานะถาวรของโต๊ะด้วย (เช่น ปิดซ่อม)
-                
-                if ($table->table_status === 'available') {
-                    $table->tailwind_color = 'bg-green-500 hover:bg-green-400'; 
-                    $table->status_for_user = 'ว่าง'; 
-                } else { 
-                    // (โต๊ะนี้อาจจะ 'unavailable' หรือ 'reserved' ถาวร)
-                    $table->tailwind_color = 'bg-gray-500 cursor-not-allowed'; 
-                    $table->status_for_user = 'ไม่ว่าง';
-                }
-            }
-            
+        // 5. (ใหม่) แยกโต๊ะ (ว่าง / ไม่ว่าง)
+
+        $tables = $allTablesInBranch->map(function ($table) use ($bookedTableIds) {
+
+            $table->is_available = !$bookedTableIds->contains($table->table_id);
             return $table;
         });
 
-        // 4. รวบรวมข้อมูลทั้งหมดเพื่อส่งกลับ
-        $viewData = [
-            'tables' => $tablesWithStatus, // <-- (สำคัญ) ส่ง $tablesWithStatus ในชื่อ $tables
-            'branchName' => $branch->branch_name,
-            'branchId' => $branch->branch_id,
-            'date' => $request->date,
-            'startTime' => $request->start_time,
-            'duration' => $request->duration,
-            'endTime' => $endTime->format('Y-m-d H:i:s'),
-        ];
+        // 6. (แก้ไข) ส่งข้อมูลผลลัพธ์กลับไป
+        $selectedBranch = DB::table('branches')->where('branch_id', $branchId)->first();
         
-        // 5. Redirect กลับไปที่ GET route พร้อมฝากข้อมูล
-        return redirect()->route('booking.table', ['branchId' => $branchId]) 
-                         ->with('search_results', $viewData);
+        $results = [
+            'selectedBranch' => $selectedBranch,
+            'tables' => $tables,
+            'userInput' => [ // (ส่งค่าที่ User กรอกกลับไปด้วย)
+            'branch_id' => (int)$branchId,
+            'date' => $selectedDate,
+            'time' => $selectedTime,
+            'duration' => $duration
+            ]
+        ];
+
+        // 7. (แก้ไข) ส่งผลลัพธ์กลับไปที่หน้าเดิม
+        return redirect()->route('booking.form', ['branchId' => $branchId])
+                         ->with('search_results', $results);
     }
     public function reserveBooking(Request $request) 
     {

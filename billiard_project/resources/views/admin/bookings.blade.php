@@ -29,6 +29,9 @@
                     {!! renderSortableHeader('final_amount', 'ยอดเงิน', $sortColumn, $sortDirection, 'admin.bookings') !!}
                     {!! renderSortableHeader('order_status', 'สถานะ Order', $sortColumn, $sortDirection, 'admin.bookings') !!}
                     {!! renderSortableHeader('pay_status', 'สถานะ Payment', $sortColumn, $sortDirection, 'admin.bookings') !!}
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">
+                        จัดการ (Actions)
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -40,9 +43,31 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ number_format($booking->final_amount, 2) }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $booking->order_status }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $booking->pay_status }} ({{ $booking->pay_method ?? 'N/A' }})</td>
+                        
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            @if ($booking->order_status == 'confirmed')
+                                {{-- ถ้าจ่ายเงินแล้ว (confirmed) ให้แสดงปุ่ม "Mark as Completed" --}}
+                                <form action="{{ route('admin.bookings.complete', $booking->order_id) }}" method="POST"
+                                      onsubmit="return confirm('ยืนยันว่าลูกค้ารายนี้เล่นเสร็จสิ้นแล้ว?');">
+                                    @csrf
+                                    <button type="submit" class="btn-mark-completed" 
+                                            style="background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer;">
+                                        Mark as Completed
+                                    </button>
+                                </form>
+                                
+                            @elseif ($booking->order_status == 'completed')
+                                {{-- ถ้าเล่นจบแล้ว (completed) ให้แสดงข้อความ --}}
+                                <span class="status-completed" style="background-color: #28a746bb; color: white; padding: 5px 10px; border-radius: 5px; border: none;">เสร็จสิ้นแล้ว</span>
+                                
+                            @else
+                                {{-- (สำหรับสถานะ pending หรือ cancelled) --}}
+                                <span class="status-other" style="color: #888;">-</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" style="padding: 20px; text-align: center;">ไม่พบข้อมูลการจอง</td></tr>
+                    <tr><td colspan="7" style="padding: 20px; text-align: center;">ไม่พบข้อมูลการจอง</td></tr>
                 @endforelse
             </tbody>
         </table>

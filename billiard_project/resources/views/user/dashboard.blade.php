@@ -46,10 +46,11 @@
                         <tr>
                             <th>รหัสจอง</th>
                             <th>บริการ</th>
+                            <th>สาขา</th>
                             <th>วัน-เวลา</th>
                             <th>สถานะ</th>
                             <th>ยอดชำระ</th>
-                            <th>จัดการ</th> {{-- (เพิ่มคอลัมน์ Action) --}}
+                            <th>จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,6 +67,7 @@
                                 @endphp
                                 {{ implode(' + ', $services) }}
                             </td>
+                            <td>{{ $booking->branch_name ?? '-' }}</td>
                             <td>
                                 {{ \Carbon\Carbon::parse($booking->display_time)->format('d/m/Y - H:i') }}
                             </td>
@@ -74,14 +76,17 @@
                                 $statusClass = '';
                                 $statusText = '';
                                 if ($booking->order_status == 'confirmed') {
-                                    $statusClass = 'status-completed'; 
-                                    $statusText = 'เสร็จสิ้น';
+                                    $statusClass = 'status-confirmed'; 
+                                    $statusText = 'ชำระแล้ว';
                                 } elseif ($booking->order_status == 'pending') {
                                     $statusClass = 'status-upcoming';
                                     $statusText = 'รอ';
                                 } elseif ($booking->order_status == 'cancelled') {
                                     $statusClass = 'status-cancelled';
                                     $statusText = 'ยกเลิก';
+                                } elseif ($booking->order_status == 'completed') {
+                                    $statusClass = 'status-completed';
+                                    $statusText = 'เสร็จสิ้น';
                                 }
                             @endphp
                             <td class="{{ $statusClass }}">{{ $statusText }}</td>
@@ -98,14 +103,13 @@
                 
                                         <button type="submit" class="cancel-btn-custom">ยกเลิก</button>
                                     </form>
-                                @elseif ($booking->order_status == 'confirmed')
+                                @elseif ($booking->order_status == 'completed')
             
                                     {{-- (แก้ไข) เช็คว่า branch_id นี้ อยู่ในลิสต์ที่รีวิวแล้วหรือยัง --}}
                                     @if ($booking->has_table && $booking->branch_id)
                                         @if ($booking->has_reviewed)
                                             <span style="color: #666; font-style: italic;">รีวิวแล้ว</span>
                                         @else
-                                            {{-- (แก้ไข) ลบ order_id ออกจาก route --}}
                                             <a href="{{ route('review.create', ['order_id' => $booking->order_id, 'branch_id' => $booking->branch_id]) }}" 
                                                 class="review-button" 
                                                 style="background: #3182CE; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none;">
