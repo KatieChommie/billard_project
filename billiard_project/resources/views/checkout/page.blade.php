@@ -130,5 +130,11 @@
             </button>
         </div>
     </form>
+
+    <div style="text-align: center; margin-top: 1rem;">
+    <a href="{{ route('user.dashboard') }}" style="color: #888; text-decoration: underline; font-size: 0.9rem;">
+        กลับหน้าหลัก (ค่อยชำระเงินทีหลัง)
+    </a>
+</div>
 </main>
 @endsection

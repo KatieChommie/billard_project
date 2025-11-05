@@ -51,18 +51,6 @@
                 </button>
             </div>
             
-            <div class="flex-row justify-between align-center mb-4">
-                <div class="form-check">
-                    <input type="checkbox" id="remember_me" name="remember">
-                    <label for="remember_me">จำฉันไว้</label>
-                </div>
-                
-                @if (Route::has('password.request'))
-                    <a class="link-footer" href="{{ route('password.request') }}">
-                        ลืมรหัสผ่าน?
-                    </a>
-                @endif
-            </div>
             
             <button type="submit" class="login-btn mb-3">เข้าสู่ระบบ</button>
         </form>

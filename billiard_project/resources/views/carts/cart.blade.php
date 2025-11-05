@@ -1,8 +1,109 @@
-@extends('layouts.app') 
-
-@section('title', 'ตะกร้าสินค้า (รอชำระเงิน)')
+@extends('layouts.app')
+@section('title', 'ตะกร้าสินค้า')
 
 @section('content')
+<main class="cart-container">
+    
+    <h1 style="text-align: center; margin-bottom: 1.5rem;">ตะกร้าสินค้า</h1>
 
+    {{-- (แสดง Error/Success Messages) --}}
+    @if(session('success'))
+        <div class="alert-success" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
 
+    @if ($cartTable)
+        <div class="cart-table-booking">
+            <h4>การจองโต๊ะของคุณ</h4>
+            <p><strong>สาขา:</strong> {{ $cartTable['display_branch_name'] }}</p>
+            <p><strong>โต๊ะหมายเลข:</strong> {{ $cartTable['display_table_numbers'] }}</p>
+            <p><strong>เวลา:</strong> {{ $cartTable['display_time'] }} ({{ $cartTable['duration'] }} นาที)</p>
+            <p style="font-weight: 600; font-size: 1.1rem; margin-top: 10px;">
+                ราคา: {{ number_format($cartTable['price'], 2) }} THB
+            </p>
+        </div>
+    @endif
+
+    <h4 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 15px;">
+        @if ($cartTable)
+            สั่งอาหารล่วงหน้าสำหรับโต๊ะนี้
+        @else
+            รายการอาหาร (สั่งกลับบ้าน)
+        @endif
+    </h4>
+
+    <div class="cart-items-list">
+        @forelse ($cartItems as $id => $details)
+            <div class="cart-item">
+                {{-- (คุณสามารถเพิ่มรูปภาพตรงนี้ได้ ถ้าส่งมาจาก CartController) --}}
+                
+                <div class="cart-item-details">
+                    <h4>{{ $details['name'] }}</h4>
+                    <p>ราคา: {{ number_format($details['price'], 2) }} THB</p>
+                    <p>รวม: {{ number_format($details['price'] * $details['quantity'], 2) }} THB</p>
+                </div>
+                
+                <div class="cart-item-actions">
+                    {{-- (ฟอร์ม Update) --}}
+                    <form action="{{ route('cart.update') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="menu_id" value="{{ $id }}">
+                        <input type="number" name="quantity" value="{{ $details['quantity'] }}" min="1">
+                        <button type="submit" class="update-btn">อัปเดต</button>
+                    </form>
+                    
+                    {{-- (ฟอร์ม Remove) --}}
+                    <form action="{{ route('cart.remove') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="menu_id" value="{{ $id }}">
+                        <button type="submit" class="remove-btn">ลบ</button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            @if (!$cartTable) {{-- ถ้าไม่มีโต๊ะด้วย --}}
+                <p style="text-align: center; font-size: 1.2rem; color: #555;">
+                    ตะกร้าสินค้าของคุณว่างเปล่า
+                </p>
+            @else
+                <p style="text-align: center; font-size: 1rem; color: #555;">
+                    คุณยังไม่ได้สั่งอาหารล่วงหน้า
+                </p>
+            @endif
+        @endforelse
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="{{ route('menu', ['branchId' => $cartTable['branch_id'] ?? 101]) }}" 
+           style="color: var(--primary-color); text-decoration: underline; font-weight: 500;">
+            + สั่งอาหารหรือเครื่องดื่มเพิ่ม
+        </a>
+    </div>
+
+    {{-- (แสดงผลรวมเฉพาะเมื่อมีสินค้า) --}}
+    @if (count($cartItems) > 0 || $cartTable)
+        <div class="cart-summary">
+            <h3>ยอดรวมทั้งหมด: {{ number_format($total, 2) }} THB</h3>
+            
+            <form action="{{ route('cart.checkout') }}" method="POST">
+                @csrf
+                <button type="submit" class="checkout-btn">
+                    ดำเนินการชำระเงิน
+                </button>
+            </form>
+
+            <a href="{{ route('cart.clear') }}" style="display: block; color: #dc3545; margin-top: 10px; text-decoration: underline;">
+                ล้างตะกร้าทั้งหมด
+            </a>
+        </div>
+    @endif
+</main>
 @endsection

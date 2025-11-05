@@ -26,7 +26,6 @@
         <section class="booking-history-section">
             <h2>2. ประวัติการจอง</h2>
 
-            {{-- (เพิ่ม) แสดง Error/Success Messages --}}
             @if ($errors->any())
             <div class="alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
                 @foreach ($errors->all() as $error)
@@ -39,7 +38,6 @@
                 {{ session('success') }}
                 </div>
             @endif
-            {{-- (สิ้นสุดส่วน Alert) --}}
 
 
             <div class="table-container">
@@ -59,23 +57,30 @@
                         @forelse ($bookings as $booking)
                         <tr>
                             <td>#{{ $booking->order_id }}</td>
-                            <td>จองโต๊ะ</td> {{-- (ข้อมูลบริการ) --}}
                             <td>
-                                {{ \Carbon\Carbon::parse($booking->start_time)->format('d/m/Y - H:i') }}
+                                @php
+                                    $services = [];
+                                    if ($booking->has_table) { $services[] = 'จองโต๊ะ'; }
+                                    if ($booking->has_food) { $services[] = 'สั่งอาหาร'; }
+                                    if (empty($services)) { $services[] = 'บริการไม่ระบุ'; }
+                                @endphp
+                                {{ implode(' + ', $services) }}
+                            </td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($booking->display_time)->format('d/m/Y - H:i') }}
                             </td>
 
-                            {{-- (Logic) แปลง status เป็น Class CSS ของคุณ --}}
                             @php
                                 $statusClass = '';
                                 $statusText = '';
                                 if ($booking->order_status == 'confirmed') {
-                                    $statusClass = 'status-completed'; // (ตรงกับ CSS Mock ของคุณ)
+                                    $statusClass = 'status-completed'; 
                                     $statusText = 'เสร็จสิ้น';
                                 } elseif ($booking->order_status == 'pending') {
-                                    $statusClass = 'status-upcoming'; // (ตรงกับ CSS Mock ของคุณ)
-                                    $statusText = 'รอชำระเงิน/ยืนยัน';
+                                    $statusClass = 'status-upcoming';
+                                    $statusText = 'รอ';
                                 } elseif ($booking->order_status == 'cancelled') {
-                                    $statusClass = 'status-cancelled'; // (ตรงกับ CSS Mock ของคุณ)
+                                    $statusClass = 'status-cancelled';
                                     $statusText = 'ยกเลิก';
                                 }
                             @endphp
@@ -83,19 +88,33 @@
 
                             <td>{{ number_format($booking->final_amount, 2) }} บาท</td>
                             <td>
-                                {{-- (สำคัญ) แสดงปุ่มเฉพาะ Order ที่ 'pending' เท่านั้น --}}
                                 @if ($booking->order_status == 'pending')
+                                    <a href="{{ route('checkout.page', ['order_id' => $booking->order_id]) }}" 
+                                        class="pay-button">ชำระเงิน</a>
                                     <form action="{{ route('dashboard.booking.cancel') }}" method="POST" 
-                                        onsubmit="return confirm('คุณต้องการยกเลิกการจองนี้ใช่หรือไม่?');">
+                                        onsubmit="return confirm('คุณต้องการยกเลิกการจองนี้ใช่หรือไม่?');" style="display: inline;">
                                         @csrf
                                         <input type="hidden" name="order_id" value="{{ $booking->order_id }}">
-                                    
-                                        {{-- (คุณต้องเพิ่ม Style ให้ปุ่มนี้เอง) --}}
-                                        <button type="submit" class="cancel-btn-custom" 
-                                                style="background-color: #E53E3E; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer;">
-                                            ยกเลิก
-                                        </button>
+                
+                                        <button type="submit" class="cancel-btn-custom">ยกเลิก</button>
                                     </form>
+                                @elseif ($booking->order_status == 'confirmed')
+            
+                                    {{-- (แก้ไข) เช็คว่า branch_id นี้ อยู่ในลิสต์ที่รีวิวแล้วหรือยัง --}}
+                                    @if ($booking->has_table && $booking->branch_id)
+                                        @if ($booking->has_reviewed)
+                                            <span style="color: #666; font-style: italic;">รีวิวแล้ว</span>
+                                        @else
+                                            {{-- (แก้ไข) ลบ order_id ออกจาก route --}}
+                                            <a href="{{ route('review.create', ['order_id' => $booking->order_id, 'branch_id' => $booking->branch_id]) }}" 
+                                                class="review-button" 
+                                                style="background: #3182CE; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none;">
+                                                    รีวิวสาขา
+                                            </a>
+                                        @endif
+                                    @else
+                                    -
+                                    @endif
                                 @else
                                 -
                                 @endif
@@ -114,16 +133,38 @@
 
         <section class="review-history-section">
             <h2>3. ประวัติการรีวิว</h2>
-            <div class="review-item">
-                <p class="review-meta"><strong>บริการ:</strong> xxx | <strong>คะแนน:</strong> ⭐⭐⭐⭐⭐</p>
-                <p class="review-text">"บรรยากาศดีมาก ผ่อนคลายสุดๆ พนักงานมืออาชีพ"</p>
-                <p class="review-date">รีวิวเมื่อ: 25/10/2025</p>
-            </div>
-            <div class="review-item">
-                <p class="review-meta"><strong>บริการ:</strong> ตัดผมชาย | <strong>คะแนน:</strong> ⭐⭐⭐⭐</p>
-                <p class="review-text">"ตัดได้ทรงสวย แต่รอนานไปหน่อย"</p>
-                <p class="review-date">รีวิวเมื่อ: 06/07/2025</p>
-            </div>
+            
+            @forelse ($reviewHistory as $review)
+                <div class="review-item" style="border-bottom: 1px solid #eee; padding-bottom: 1rem; margin-bottom: 1rem;">
+                    
+                    {{-- (แสดง สาขา และ ดาว) --}}
+                    <p class="review-meta">
+                        <strong>สาขา:</strong> {{ $review->branch_name }} | 
+                        <strong>คะแนน:</strong> 
+                        <span style="color: #facc15; font-size: 1.1rem;">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $review->rating) ⭐ @else <span style="color: #ccc;">☆</span> @endif
+                        @endfor
+                        </span>
+                    </p>
+                    
+                    {{-- (แสดง คอมเมนต์) --}}
+                    <p class="review-text" style="font-style: italic; color: #333; margin: 0.5rem 0;">
+                        "{{ $review->review_descrpt }}"
+                    </p>
+                    
+                    {{-- (แสดง วันที่) --}}
+                    <p class="review-date" style="font-size: 0.85rem; color: #888;">
+                        รีวิวเมื่อ: {{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y') }}
+                    </p>
+                </div>
+            @empty
+                {{-- (กรณีที่ยังไม่เคยรีวิว) --}}
+                <div class="review-item">
+                    <p style="text-align: center; color: #777;">คุณยังไม่มีประวัติการรีวิว</p>
+                </div>
+            @endforelse
+
         </section>
 </div>
 @endsection

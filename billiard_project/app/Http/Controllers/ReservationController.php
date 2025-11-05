@@ -161,76 +161,61 @@ class ReservationController extends Controller
                          ->with('search_results', $viewData);
     }
     public function reserveBooking(Request $request) 
-{
-    // 0. Ensure user is authenticated
-    if (!Auth::check()) {
-        // Redirect guests to login before allowing reservation
-        return redirect()->route('login')->with('warning', 'กรุณาเข้าสู่ระบบก่อนทำการจอง');
-    }
+    {
+        // 0. ตรวจสอบ Auth
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('warning', 'กรุณาเข้าสู่ระบบก่อนทำการจอง');
+        }
 
-    // 1. Validation 
-    $request->validate([
-            // *** อย่าลืมแก้ Bug ที่เราคุยกันก่อนหน้านี้ ***
+        // 1. Validation
+        $request->validate([
             'selected_tables' => 'required|string',
             'start_time' => 'required|date_format:Y-m-d H:i:s',
             'end_time' => 'required|date_format:Y-m-d H:i:s',
             'duration' => 'required|integer',
+            'branch_id' => 'required|integer|exists:branches,branch_id',
         ]);
 
-    // 2. Logic การบันทึก (DB Transaction)
-    try {
-        $newOrderId = null;
-        DB::transaction(function () use ($request, &$newOrderId) {
-                
-                $userId = Auth::id();
+        // --- (นี่คือ Logic ใหม่ที่ขาดไป) ---
+        $tableIds = explode(',', $request->input('selected_tables'));
+        $branchId = $request->branch_id;
 
-                // *** แก้ไข: แปลง String "101,102" เป็น Array ***
-                $tableIds = explode(',', $request->input('selected_tables'));
+        // 2. ดึงชื่อสาขา
+        $branch = DB::table('branches')->where('branch_id', $branchId)->first();
+        $branchName = $branch ? $branch->branch_name : 'ไม่พบสาขา';
+
+        // 3. ดึงหมายเลขโต๊ะ (table_number)
+        $tables = DB::table('tables')->whereIn('table_id', $tableIds)->pluck('table_number');
+        $tableNumbersStr = $tables->implode(', '); // (ผลลัพธ์เช่น: "1, 2, 5")
+        // ---------------------------------
+
+        // 4. คำนวณราคาโต๊ะ
+        $durationMins = (int) $request->duration;
+        $totalTables = count($tableIds);
+        $tablePrice = (50 * ($durationMins / 30)) * $totalTables;
+
+        // 5. สร้างข้อมูลโต๊ะสำหรับใส่ตะกร้า (ใช้ข้อมูลใหม่)
+        $tableReservationData = [
+            'branch_id' => $request->branch_id,
+            'table_ids' => $tableIds, // (เก็บ ID จริงไว้สำหรับบันทึกลง DB)
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'duration' => $durationMins,
+            'price' => $tablePrice,
             
-            // a. สร้าง Order หลัก
-            $orderId = DB::table('orders')->insertGetId([
-                'user_id' => $userId,
-                'order_date' => now(),
-                'order_status' => 'pending', 
-            ]);
+            // (ข้อมูลสำหรับแสดงผลที่ถูกต้อง)
+            'display_branch_name' => $branchName,
+            'display_table_numbers' => $tableNumbersStr,
+            'display_time' => Carbon::parse($request->start_time)->format('d/m/Y H:i')
+        ];
 
-            $newOrderId = $orderId;
+        // 6. ล้างตะกร้าเก่า และเพิ่มโต๊ะลงตะกร้าใหม่
+        session()->forget('cart');
+        session()->put('cart.table', $tableReservationData); 
 
-            // b. สร้างรายการ Reservation สำหรับทุกโต๊ะที่เลือก
-            foreach ($tableIds as $tableId) {
-                DB::table('reservation')->insert([
-                    'order_id' => $orderId,
-                    'table_id' => $tableId,
-                    'start_time' => $request->start_time,
-                    'end_time' => $request->end_time,
-                    'reserve_status' => 'confirmed',
-                ]);
-            }
-            
-            // c. คำนวณราคาและสร้างรายการ Payment
-            $durationMins = (int) $request->duration;
-            $totalTables = count($tableIds);
-            $totalAmount = (50 * ($durationMins / 30)) * $totalTables; // 50 บาท/30 นาที
-            
-            DB::table('payment')->insert([
-                'order_id' => $orderId,
-                'total_amount' => $totalAmount,
-                'discount_amount' => 0.00,      // (เพิ่ม)
-                'final_amount' => $totalAmount, // (ยอดเริ่มต้น = ยอดเต็ม)
-                'pay_status' => 'pending',
-                'reward_id' => null,
-            ]);
-        });
-
-        // 3. นำทางไปยังหน้า Checkout
-        return redirect()->route('checkout.page', ['order_id' => $newOrderId])
-                             ->with('success', 'จองโต๊ะสำเร็จ! โปรดชำระเงิน');
-
-    } catch (\Exception $e) {
-        // จัดการ Error (Foreign Key, DB Fails)
-        return back()->withInput()->withErrors(['message' => 'เกิดข้อผิดพลาดในการบันทึกการจอง: ' . $e->getMessage()]);
+        // 7. Redirect ไปหน้าตะกร้า (ไม่ใช่ checkout)
+        return redirect()->route('cart.index')->with('success', 'เพิ่มการจองโต๊ะลงในตะกร้าแล้ว! คุณสามารถสั่งอาหารต่อได้');
     }
-}
 
     public function showCheckoutPage(Request $request, $order_id = null)
     {
@@ -383,9 +368,9 @@ class ReservationController extends Controller
                         ]);
                         
                     // อัปเดตคูปอง (Reward Transaction)
-                    DB::table('reward_transaction')
-                        ->where('id', $reward->transaction_id)
-                        ->update(['status' => 'used']); // (ใช้แล้ว)
+                    DB::table('reward') 
+                        ->where('reward_id', $reward->reward_id)
+                        ->update(['reward_status' => 'used']);
                 }
             });
             

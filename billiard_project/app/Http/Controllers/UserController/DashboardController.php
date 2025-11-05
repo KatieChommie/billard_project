@@ -16,30 +16,66 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
 
-        // ดึงข้อมูลการจอง (Orders) ที่เกี่ยวข้องกับ User นี้
-        $bookings = DB::table('orders')
-            ->join('payment', 'orders.order_id', '=', 'payment.order_id')
-            ->join('reservation', 'orders.order_id', '=', 'reservation.order_id')
-            ->where('orders.user_id', $userId)
-            // เอาสถานะล่าสุด
-            ->whereIn('orders.order_status', ['pending', 'confirmed', 'cancelled']) 
+        // --- 1. ดึงข้อมูลสำหรับ "ตารางประวัติการจอง" (Bookings) ---
+        
+        // 1a. ค้นหา "Order ID" ที่รีวิวไปแล้ว (เพื่อซ่อนปุ่ม)
+        $reviewedOrderIds = DB::table('review')
+                                ->where('user_id', $userId)
+                                ->pluck('order_id') 
+                                ->unique();
+
+        // 1b. ค้นหาประวัติการจอง (Bookings)
+        $bookings = DB::table('orders as o')
+            ->join('payment as p', 'o.order_id', '=', 'p.order_id')
+            ->leftJoin('purchase as pur', 'o.order_id', '=', 'pur.order_id')
+            ->leftJoin('reservation as res', 'o.order_id', '=', 'res.order_id')
+            ->leftJoin('tables as t', 'res.table_id', '=', 't.table_id')
+            ->leftJoin('branches as b', 't.branch_id', '=', 'b.branch_id')
+            ->where('o.user_id', $userId)
+            ->whereIn('o.order_status', ['pending', 'confirmed', 'cancelled'])
             ->select(
-                'orders.order_id',
-                'orders.order_status',
-                'payment.final_amount',
-                'reservation.start_time' // เอาเวลาเริ่มจอง
+                'o.order_id',
+                'o.order_status',
+                'p.final_amount',
+                DB::raw('COALESCE(res.start_time, o.order_date) as display_time'),
+                DB::raw('COUNT(DISTINCT res.order_id) > 0 as has_table'),
+                DB::raw('COUNT(DISTINCT pur.purchase_id) > 0 as has_food'),
+                'b.branch_id' 
             )
-            ->groupBy( // Group by เพื่อป้องกันการแสดงผลซ้ำ (กรณี 1 Order มีหลายโต๊ะ)
-                'orders.order_id', 
-                'orders.order_status', 
-                'payment.final_amount', 
-                'reservation.start_time'
+            ->groupBy( 
+                'o.order_id', 'o.order_status', 'p.final_amount', 'o.order_date',
+                'res.start_time', 'b.branch_id'
             ) 
-            ->orderBy('reservation.start_time', 'desc') // เรียงจากใหม่ไปเก่า
+            ->orderBy('display_time', 'desc')
             ->get();
 
+        // 1c. เพิ่มสถานะ 'has_reviewed' เข้าไปใน bookings
+        $bookings = $bookings->map(function ($booking) use ($reviewedOrderIds) {
+            $booking->has_reviewed = $reviewedOrderIds->contains($booking->order_id);
+            return $booking;
+        });
+        
+        // --- 2. (ใหม่) ดึงข้อมูลสำหรับ "ประวัติการรีวิว" (Review History) ---
+        $reviewHistory = DB::table('review as r')
+            ->join('users as u', 'r.user_id', '=', 'u.user_id')
+            ->join('orders as o', 'r.order_id', '=', 'o.order_id')
+            ->leftJoin('reservation as res', 'o.order_id', '=', 'res.order_id')
+            ->leftJoin('tables as t', 'res.table_id', '=', 't.table_id')
+            ->leftJoin('branches as b', 't.branch_id', '=', 'b.branch_id')
+            ->where('r.user_id', $userId)
+            ->select(
+                'r.rating',
+                'r.review_descrpt', // (ใช้ชื่อคอลัมน์จริง)
+                'r.created_at',
+                DB::raw("COALESCE(b.branch_name, 'สั่งกลับบ้าน/ไม่ระบุ') as branch_name")
+            )
+            ->orderBy('r.created_at', 'desc')
+            ->get();
+
+        // --- 3. ส่งข้อมูลทั้งหมดไปที่ View ---
         return view('user.dashboard', [
-            'bookings' => $bookings // ส่งตัวแปร $bookings ไปที่ View
+            'bookings' => $bookings,
+            'reviewHistory' => $reviewHistory // (ส่งตัวแปรใหม่ไปด้วย)
         ]);
     }
 

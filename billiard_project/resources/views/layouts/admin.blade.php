@@ -29,16 +29,16 @@
                             <a href="{{ route('admin.dashboard') }}" class="nav__link">Dashboard</a>
                         </li>
                         <li class="nav__item {{ Request::is('admin/users*') ? 'active' : '' }}">
-                            <a href="#" class="nav__link">ผู้ใช้</a>
+                            <a href="{{ route('admin.users') }}" class="nav__link">ผู้ใช้</a>
                         </li>
                         <li class="nav__item {{ Request::is('admin/branches*') ? 'active' : '' }}">
-                            <a href="#" class="nav__link">สาขา</a>
+                            <a href="{{ route('admin.branches') }}" class="nav__link">สาขา</a>
                         </li>
                         <li class="nav__item {{ Request::is('admin/menus*') ? 'active' : '' }}">
-                            <a href="#" class="nav__link">เมนู</a>
+                            <a href="{{ route('admin.menus') }}" class="nav__link">เมนู</a>
                         </li>
                         <li class="nav__item {{ Request::is('admin/bookings*') ? 'active' : '' }}">
-                            <a href="#" class="nav__link">การจอง</a>
+                            <a href="{{ route('admin.bookings') }}" class="nav__link">การจอง</a>
                         </li>
                         <li class="nav__item">
                             <a href="{{ route('home') }}" class="nav__link admin-home-link">

@@ -648,6 +648,28 @@ footer {
     background-color: #1a6f08;
 }
 
+/* Cancel button used in user dashboard - match site style but indicate destructive action */
+.cancel-btn-custom {
+    background-color: #e73c3c; /* red */
+    color: white;
+    margin: 0 0 10px 0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-thai);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.08s;
+    border: none;
+    display: inline-block;
+}
+
+.cancel-btn-custom:hover {
+    background-color: #c0392b;
+}
+
+
 .link-footer {
     padding-top: 10px;
     padding-bottom: 10px;
@@ -854,6 +876,20 @@ footer {
     font-size: 1rem; font-weight: 500; text-align: center;
 }
 
+.sortable-link {
+    color: inherit; /* ใช้สีเดียวกับหัวตาราง */
+    text-decoration: none;
+    font-weight: bold;
+}
+.sortable-link:hover {
+    color: var(--primary-color)
+}
+.sortable-link .arrow {
+    font-size: 0.9em;
+    margin-left: 4px;
+    color: var(--link-hover-color)
+}
+
 /*User Dashboard*/
 .user-dashboard{
     position: relative;
@@ -872,7 +908,14 @@ footer {
     width: auto; 
     padding: 0 12px 0 8px; 
     border-radius: 8px;
+    color: var(--secondary-color);
+    background-color: var(--primary-color);
 }
+
+.user-dashboard .back-link:hover{
+    background-color: var(--link-hover-color);
+}
+
 .user-dashboard h1{
     color: var(--primary-color);
     text-align: center;
@@ -907,7 +950,7 @@ section {
 }
 
 .user-info-section .button:hover{
-    background-color: #d2ff0791;
+    background-color: #d2ff07ad;
 }
 
 .info-grid {
@@ -919,11 +962,11 @@ section {
 
 .highlight-points {
     font-weight: bold;
-    color: #28a745; /* สีเขียวสำหรับแต้มสะสม */
-    font-size: 1.1em;
+    color: #28a745;
+    font-size: 1.7em;
 }
 
-/* --- Booking History Section (Table) --- */
+/* --- ประวัติการจอง--- */
 .table-responsive {
     overflow-x: auto;
 }
@@ -967,8 +1010,6 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
-/* หากต้องการให้ 'ยอดชำระ' ชิดขวาเหมือนในรูป ให้เพิ่มคลาส align-right ใน HTML
-   <td class="align-right">1,200 บาท</td> */
 .align-right {
     text-align: right !important; 
 }
@@ -979,7 +1020,7 @@ tr:hover {
 .status-cancelled {
     font-weight: 400;
     font-size: 1.05em;
-    margin:0.2rem 0.2rem 0.2rem 15px;
+    margin:0.2rem 0.2rem 0.2rem 14px;
     padding: 8px 15px;
     border-radius: 8px;
     display: inline-block;
@@ -1001,16 +1042,27 @@ tr:hover {
     background-color: #DC3545;
 }
 
-.table-btn.booked {
-    background-color: #E2E8F0; /* สีเทา */
-    color: #A0AEC0; /* สีตัวอักษรเทา */
-    cursor: not-allowed;
-    border: 2px solid #CBD5E0;
-    opacity: 0.7; /* ทำให้จางลงเล็กน้อย */
+.pay-button {
+    background-color: #FFC107;
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 8px;
 }
 
-.table-btn.booked img {
-    opacity: 0.5; /* ทำให้ไอคอนจางลง */
+.pay-button:hover{
+    background-color: #ffc107b6;
+}
+.cancel-btn-custom{
+    background-color: #DC3545;
+    color: var(--secondary-color);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+
+.cancel-btn-custom:hover{
+    background-color: #dc3546ce;
 }
 
 /* --- Review History Section --- */
@@ -1055,9 +1107,15 @@ tr:hover {
 /*points*/
 .points-container{
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 900px;
+    padding-top: 2rem;
+    margin: 2rem auto;
 }
 /*back button*/
-.user-dashboard .back-link,
+
 .points-container .back-link {
     width: auto; 
     padding: 0 12px 0 8px; 
@@ -1066,13 +1124,12 @@ tr:hover {
     background-color: var(--primary-color);
 }
 
-.user-dashboard .back-link:hover,
 .points-container .back-link:hover {
     background-color: var(--link-hover-color);
 }
 
 .points-container .current-points-box{
-    color: var(--secondary-color);
+    color: white;
     font-weight: 600;
     font-size: 1.7rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -1085,14 +1142,50 @@ tr:hover {
 }
 
 .points-container .alert-message{
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
     text-align: center;
-    padding: 20px;
+}
+
+.alert-success { 
+    background-color: #d4edda;
+    color: #155724;
+}
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.points-container .nav-button{
+    font-family: var(--font-thai);
+    background-color: var(--primary-color);
+    color: white;
+    margin: 5px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 400;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+.points-container .nav-button:hover{
+    background-color: var(--link-hover-color);
+}
+
+.section-title { 
+    font-size: 1.8rem; font-weight: 600; color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px; margin: 30px 0 20px 0;
 }
 
 .points-navigation{
     text-align: center;
 }
-
+.history-link-box {
+    display: flex;
+    justify-content: center;
+}
 .points-navigation .nav-button{
     background-color: var(--primary-color);
     color: var(--secondary-color);
@@ -1181,6 +1274,64 @@ tr:hover {
     color: #dc3545; /* สีแดง */
 }
 
+.reward-store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+.redeem-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+}
+.redeem-card h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-color); }
+.redeem-card .points-cost {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 10px 0;
+}
+.redeem-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+.redeem-btn:hover {
+    background-color: var(--link-hover-color);
+}
+.redeem-btn:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+.my-coupons-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.coupon-item {
+    background-color: #f9f9f9;
+    border: 1px dashed var(--primary-color);
+    padding: 15px;
+    border-radius: 8px;
+}
+.coupon-item h4 {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+.coupon-item .expiry{
+    font-size: 0.9rem;
+    color: #555;
+}
 
 /*Branches*/
 .branches-container{
@@ -1450,9 +1601,90 @@ tr:hover {
 .menu-container .add-to-cart-btn:hover {
     background-color: var(--link-hover-color);
 }
-/*Booking*/
 
-/* ---------------- BOOKING PAGE STYLING ---------------- */
+/*Cart*/
+.cart-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-details h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.cart-item-details p { 
+    color: #555;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.cart-item-actions input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.update-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px; 
+    cursor: pointer;
+}
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.cart-summary {
+    margin-top: 25px;
+    border-top: 2px solid #333;
+    padding-top: 20px;
+    text-align: right;
+}
+.cart-summary h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+.checkout-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1.2rem;
+    margin-top: 15px;
+    display: inline-block;
+}
+.checkout-btn:hover {
+    background-color: var(--link-hover-color);
+}
+
+/*Booking*/
 .booking-page-container {
     display: flex;
     justify-content: center;

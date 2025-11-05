@@ -10,7 +10,35 @@ class SiteController extends Controller
     public function index()
     {
 
-        return view('index');
+        $branches = DB::table('branches')->get();
+        
+
+        $reviews = DB::table('review as r')
+            ->join('users as u', 'r.user_id', '=', 'u.user_id')
+            ->join('orders as o', 'r.order_id', '=', 'o.order_id')
+
+            ->leftJoin('reservation as res', 'o.order_id', '=', 'res.order_id')
+            ->leftJoin('tables as t', 'res.table_id', '=', 't.table_id')
+            ->leftJoin('branches as b', 't.branch_id', '=', 'b.branch_id')
+            
+            ->select(
+                'r.rating',
+                'r.review_descrpt as comment', // (ใช้ชื่อคอลัมน์จริง)
+                'r.created_at',
+                'u.username',
+                
+                // (กันเหนียว) ถ้าหาชื่อสาขาไม่เจอ (เช่น Order สั่งกลับบ้าน)
+                DB::raw("COALESCE(b.branch_name, 'สั่งกลับบ้าน/ไม่ระบุ') as branch_name")
+            )
+            ->orderBy('r.created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // 3. (แก้ไข) ส่งตัวแปร $reviews
+        return view('index', [
+            'branches' => $branches,
+            'reviews' => $reviews
+        ]);
     }
     //login and registration
     public function login()
@@ -168,22 +196,55 @@ class SiteController extends Controller
     }
     
     //points-category
+    private $rewardStore = [
+        'REDEEM_50' => [
+            'id' => 'REDEEM_50',
+            'points_required' => 100,
+            'reward_descrpt' => 'ส่วนลด 50 บาท',
+            'reward_value' => 50,
+            'reward_discount' => 'baht',
+            'duration_days' => 30, // (คูปองมีอายุ 30 วัน)
+        ],
+        'REDEEM_120' => [
+            'id' => 'REDEEM_120',
+            'points_required' => 650,
+            'reward_descrpt' => 'ส่วนลด 120 บาท',
+            'reward_value' => 120,
+            'reward_discount' => 'baht',
+            'duration_days' => 30,
+        ],
+        'REDEEM_10_PERCENT' => [
+            'id' => 'REDEEM_10_PERCENT',
+            'points_required' => 500,
+            'reward_descrpt' => 'ส่วนลด 10%',
+            'reward_value' => 10,
+            'reward_discount' => 'percent',
+            'duration_days' => 15,
+        ],
+    ];
+
+
+    // (แก้ไข) 2. แก้ไขเมธอด pointsPage
     public function pointsPage()
     {
         $user = Auth::user(); 
         $currentPoints = $user->loyalty_points;
         
-        // ดึงรายการคูปองที่แลกได้ (ส่วนที่ 3)
-        $redeemableRewards = DB::table('reward')
-            ->where('reward_status', 'active')
-            ->where('reward_type', 'points') 
-            ->where('expired_date', '>', now())
-            ->orderBy('reward_value', 'asc')
-            ->get();
+        // (แก้ไข) ดึง "คูปองที่แลกได้" จาก "ร้านค้า" ที่เราสร้าง
+        $redeemableRewards = $this->rewardStore;
             
+        // (เพิ่ม) ดึง "คูปองที่ User มีอยู่" (ที่ยังไม่หมดอายุและยังไม่ใช้)
+        $myActiveCoupons = DB::table('reward')
+            ->where('user_id', $user->user_id)
+            ->where('reward_status', 'active')
+            ->where('expired_date', '>=', now()->toDateString())
+            ->orderBy('expired_date', 'asc')
+            ->get();
+
         return view('points.points', [
             'currentPoints' => $currentPoints,
-            'rewards' => $redeemableRewards,
+            'redeemableRewards' => $redeemableRewards, // <-- ส่ง "ร้านค้า" ไป
+            'myActiveCoupons' => $myActiveCoupons, // <-- ส่ง "คูปองที่มี" ไป
         ]);
     }
     public function pointsHistoryPage()
@@ -267,61 +328,60 @@ class SiteController extends Controller
     {
         // 1. ดึงข้อมูลที่จำเป็น
         $user = Auth::user();
-        $rewardId = $request->input('reward_id'); // ดึง ID คูปองจากฟอร์มที่ซ่อนไว้
+        $rewardId = $request->input('reward_id'); // (รับ ID จาก Form เช่น 'REDEEM_50')
 
-        // 2. เริ่มต้น Transaction (สำคัญมาก!)
-        // DB::transaction จะช่วยให้แน่ใจว่าถ้ามีอะไรผิดพลาด
-        // ฐานข้อมูลจะย้อนกลับ (Rollback) ทั้งหมด
+        // 2. ค้นหาคูปองนี้จาก "ร้านค้า"
+        if (!isset($this->rewardStore[$rewardId])) {
+            return redirect()->route('points.index')->with('error', 'ไม่พบรายการคูปองที่ต้องการแลก');
+        }
+        $rewardToRedeem = $this->rewardStore[$rewardId];
+
+        // 3. เริ่มต้น Transaction
         try {
             
-            $result = DB::transaction(function () use ($user, $rewardId) {
+            $result = DB::transaction(function () use ($user, $rewardToRedeem) {
 
-                // 3. (Validation) ดึงข้อมูลคูปองและ "ล็อค" แถวนี้ไว้
-                // ใช้ sharedLock() เพื่อป้องกันการแลกซ้ำซ้อน
-                $reward = DB::table('reward')
-                    ->where('reward_id', $rewardId)
-                    ->lockForUpdate() // ล็อคแถวนี้เพื่อป้องกันการกดแลกพร้อมกัน
-                    ->first();
-
-                // 4. (Validation) ตรวจสอบเงื่อนไขก่อนแลก
-                if (!$reward) {
-                    return ['success' => false, 'message' => 'ไม่พบคูปองนี้'];
-                }
-
-                if ($reward->reward_status !== 'active') {
-                    return ['success' => false, 'message' => 'คูปองนี้ถูกใช้ไปแล้วหรือหมดอายุ'];
-                }
-
-                // 5. (Validation) ดึงแต้มผู้ใช้ล่าสุด (จำเป็นต้องดึงใหม่ใน transaction)
+                // 4. (Validation) ดึงแต้มผู้ใช้ล่าสุด (จำเป็นต้องดึงใหม่ใน transaction)
                 $currentUserPoints = DB::table('users')
                                     ->where('user_id', $user->user_id)
+                                    ->lockForUpdate() // (สำคัญ) ล็อคแถวนี้กัน User แลกซ้ำซ้อน
                                     ->value('loyalty_points');
 
-                if ($currentUserPoints < $reward->points_required) {
+                // 5. (Validation) เช็คแต้ม
+                if ($currentUserPoints < $rewardToRedeem['points_required']) {
                     return ['success' => false, 'message' => 'คะแนนสะสมไม่เพียงพอ'];
                 }
 
-
-                // --- ถ้าทุกอย่างผ่าน ---
+                // --- ถ้าแต้มพอ ---
 
                 // 6. (Action 1) ลดแต้มผู้ใช้
                 DB::table('users')
                     ->where('user_id', $user->user_id)
-                    ->decrement('loyalty_points', $reward->points_required);
+                    ->decrement('loyalty_points', $rewardToRedeem['points_required']);
 
-                // 7. (Action 2) เปลี่ยนสถานะคูปองเป็น 'used'
-                DB::table('reward')
-                    ->where('reward_id', $rewardId)
-                    ->update(['reward_status' => 'used']);
+                // 7. (Action 2) "สร้าง" คูปองใหม่ลงในตาราง 'reward'
+                DB::table('reward')->insert([
+                    'user_id' => $user->user_id,
+                    'reward_descrpt' => $rewardToRedeem['reward_descrpt'],
+                    'reward_type' => 'points', // (เพราะแลกจากแต้ม)
+                    'reward_value' => $rewardToRedeem['reward_value'],
+                    'reward_discount' => $rewardToRedeem['reward_discount'],
+                    'reward_status' => 'active', // (สถานะ: พร้อมใช้)
+                    'issued_date' => now(),
+                    'expired_date' => now()->addDays($rewardToRedeem['duration_days']),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
-                // 8. (Action 3) บันทึกประวัติการใช้แต้ม
+                // 8. (Action 3) บันทึกประวัติการใช้แต้ม (Transaction Log)
                 DB::table('reward_transaction')->insert([
                     'user_id' => $user->user_id,
-                    'transact_type' => 'redeemed', // ประเภท: แลกแต้ม
-                    'pts_change' => $reward->points_required, // จำนวนแต้มที่เปลี่ยนแปลง [cite: 220]
-                    'transact_descrpt' => 'แลกคูปอง: ' . $reward->reward_descrpt,
+                    'transact_type' => 'redeemed', // (ประเภท: แลกแต้ม)
+                    'pts_change' => $rewardToRedeem['points_required'], // (ใช้แต้มไปเท่าไหร่)
+                    'transact_descrpt' => 'แลกคูปอง: ' . $rewardToRedeem['reward_descrpt'],
                     'transact_date' => now(),
-                    // 'transact_id' จะถูกสร้างอัตโนมัติ (ถ้าตั้งค่าไว้)
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
 
                 return ['success' => true, 'message' => 'แลกคูปองสำเร็จ!'];
@@ -336,7 +396,7 @@ class SiteController extends Controller
             }
 
         } catch (\Exception $e) {
-            // 10. หากเกิด Error ร้ายแรง (เช่น DB ล่ม)
+            // 10. หากเกิด Error ร้ายแรง
             return redirect()->route('points.index')->with('error', 'เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: ' . $e->getMessage());
         }
     }

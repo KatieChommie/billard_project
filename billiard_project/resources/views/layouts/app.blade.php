@@ -27,15 +27,13 @@
                     <nav class="header__nav">
                         <ul class="nav__list">
                             <li class="nav__item"><a href="{{ route('home') }}" class="nav__link">หน้าหลัก</a></li>
-                            <li class="nav__item"><a href="{{ route('booking.branches') }}" class="nav__link">สาขาของเรา</a></li>
-                            <!--<li class="nav__item"><a href=" route('booking.table') " class="nav__link">จองโต๊ะ</a></li>-->
+                            <li class="nav__item"><a href="{{ route('booking.branches') }}" class="nav__link">จองโต๊ะ</a></li>
                             <li class="nav__item"><a href="{{ route('menu') }}" class="nav__link">เมนูอาหาร</a></li>
-                            <li class="nav__item"><a href="{{ route('reviews') }}" class="nav__link">รีวิว</a></li>
                         </ul>
                     </nav>
 
                     <div class="header__actions">
-                        <a href="{{ route('carts.cart') }}" class="action__cart"><i class='bx bx-cart'></i></a>
+                        <a href="{{ route('cart.index') }}" class="action__cart"><i class='bx bx-cart'></i></a>
                         @guest
                             <a href="{{ route('login') }}" class="nav__button">เข้าสู่ระบบ</a>
                         @endguest
