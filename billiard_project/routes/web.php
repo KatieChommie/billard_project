@@ -87,7 +87,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
      Route::get('/admin/menus', [AdminController::class, 'manageMenus'])->name('admin.menus');
      Route::get('/admin/menus/edit/{branch_id}/{menu_id}', [AdminController::class, 'editMenu'])->name('admin.menus.edit'); 
      Route::post('/admin/menus/update/{branch_id}/{menu_id}', [AdminController::class, 'updateMenu'])->name('admin.menus.update'); 
-     Route::get('/admin/tables', [AdminController::class, 'manageTables'])->name('admin.tables');
+     Route::get('/admin/tables/availability', [AdminController::class, 'showTableAvailability'])->name('admin.tables.availability');
+     Route::post('/admin/tables/availability', [AdminController::class, 'showTableAvailability'])->name('admin.tables.check');
      Route::get('/admin/bookings', [AdminController::class, 'manageBookings'])->name('admin.bookings');
 });
 

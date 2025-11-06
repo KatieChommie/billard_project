@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-// ต้องเพิ่ม Rule สำหรับ Validation ในการอัปเดต
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule; 
 
 class AdminController extends Controller
@@ -43,19 +43,21 @@ class AdminController extends Controller
             ->get();
 
 
-        // 2. (แก้ไข) ส่งตัวแปรทั้งหมดไปให้ View
         return view('admin.dashboard', [
             'userCount'     => $userCount,
             'todayBookings' => $todayBookings,
             'reviewCount'   => $reviewCount,
-            'ordersToComplete' => $ordersToComplete, // <-- (ส่งตัวแปรใหม่นี้ไป)
+            'ordersToComplete' => $ordersToComplete,
         ]);
     }
 
-public function markAsCompleted($order_id)
+public function markAsCompleted(Request $request)
 {
-    // (กัน Admin กดพลาด)
-    // อนุญาตให้อัปเดตเฉพาะ Order ที่จ่ายเงินแล้ว (confirmed)
+    $order_id = $request->input('order_id');
+    if (!$order_id) {
+        return back()->with('error', 'Order ID not found.');
+    }
+
     DB::table('orders')
         ->where('order_id', $order_id)
         ->where('order_status', 'confirmed') 
@@ -219,6 +221,106 @@ public function manageTables(Request $request)
     ]);
 }
 
+
+// ... (code above)
+
+// **FIXED Method: Show Table Availability for a Specific Time Slot**
+public function showTableAvailability(Request $request)
+{
+    $branches = DB::table('branches')->get(); // Get all branches for the dropdown
+
+    // Set default values for the form
+    $branchId = $request->input('branch_id');
+    $date = $request->input('date', Carbon::today()->toDateString());
+    $time = $request->input('time', '18:00'); // Default check time is 18:00
+    $duration = 1; // Assume default booking duration is 1 hour for checking (adjust as needed)
+
+    $availableTables = collect();
+    $selectedBranch = null;
+
+    if ($branchId) {
+        $selectedBranch = $branches->firstWhere('branch_id', $branchId);
+
+        // 1. Calculate the start and end time of the slot to check
+        $startTime = Carbon::parse("$date $time");
+        $endTime = $startTime->copy()->addHours($duration);
+
+        // 2. Get all tables for the selected branch
+        $allTables = DB::table('tables')
+            ->where('branch_id', $branchId)
+            ->get();
+
+        // **FIXED QUERY:** 3. Get existing CONFIRMED reservations only for the selected tables (Implicitly filtered by branch via the tables join)
+        // **ปรับ Query ให้ดึงข้อมูลที่เกี่ยวข้องกับ Reservation และ Order ที่จำเป็นเท่านั้น**
+        $reservedTables = DB::table('reservation')
+            ->join('orders', 'reservation.order_id', '=', 'orders.order_id')
+            ->join('tables', 'reservation.table_id', '=', 'tables.table_id') 
+            
+            // **FIX 1: ใช้ whereIn กรองเฉพาะ table_id ที่อยู่ในสาขาที่เลือก**
+            ->whereIn('reservation.table_id', $allTables->pluck('table_id'))
+            
+            // **FIX 2: กรองวันที่และสถานะ**
+            ->whereDate('reservation.start_time', $date) 
+            ->where('reservation.reserve_status', '!=', 'cancelled') 
+            
+            ->select('reservation.*', 'orders.user_id') 
+            ->get();
+
+        // 4. Determine availability for each table
+        foreach ($allTables as $table) {
+            $isBooked = false;
+            $bookingDetails = null;
+
+            // **FIX 3: กรอง $reservedTables ให้เหลือเฉพาะการจองของโต๊ะปัจจุบัน**
+            // ใช้ where() filter เพื่อหาการจองที่เกี่ยวข้องกับโต๊ะ $table->table_id
+            $tableReservations = $reservedTables->where('table_id', $table->table_id);
+
+
+            foreach ($tableReservations as $reservation) {
+                // ไม่ต้องทำ check 'if ($reservation->table_id !== $table->table_id)' ซ้ำแล้ว
+
+                $resStartTime = Carbon::parse($reservation->start_time);
+                $resEndTime = Carbon::parse($reservation->end_time);
+
+                // Check for time overlap: [Start A < End B] AND [End A > Start B]
+                $hasConflict = $startTime->lt($resEndTime) && $endTime->gt($resStartTime);
+
+                if ($hasConflict) {
+                    $isBooked = true;
+                    // Fetch user details for display (ใช้ user_id ที่ Join มาแล้ว)
+                    // **FIX 4: ใช้ $reservation->user_id ที่ดึงมาจากการ JOIN**
+                    $user = DB::table('users')->where('user_id', $reservation->user_id)->first(); 
+                    $bookingDetails = (object)[
+                        'reserve_id' => $reservation->reserve_id, 
+                        'start_time' => $resStartTime->format('H:i'),
+                        'end_time' => $resEndTime->format('H:i'),
+                        'user_name' => $user ? "$user->first_name $user->last_name" : 'N/A',
+                    ];
+                    break;
+                }
+            }
+            // ... (rest of the loop remains the same)
+
+            $availableTables->push((object)[
+                'table_id' => $table->table_id,
+                'table_number' => $table->table_number,
+                'is_booked' => $isBooked,
+                'details' => $bookingDetails,
+                'current_status' => $table->table_status, 
+            ]);
+        }
+    }
+
+    return view('admin.table-availability', [
+        'branches' => $branches,
+        'selectedBranchId' => $branchId,
+        'selectedDate' => $date,
+        'selectedTime' => $time,
+        'availableTables' => $availableTables,
+        'selectedBranch' => $selectedBranch,
+    ]);
+}
+// ... (code below)
 
 public function manageMenus(Request $request) // **อัปเดต: รับ Request**
     {

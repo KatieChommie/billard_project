@@ -37,8 +37,8 @@
                         <li class="nav__item {{ Request::is('admin/menus*') ? 'active' : '' }}">
                             <a href="{{ route('admin.menus') }}" class="nav__link">เมนู</a>
                         </li>
-                        <li class="nav__item {{ Request::is('admin/bookings*') ? 'active' : '' }}">
-                            <a href="{{ route('admin.tables') }}" class="nav__link">จัดการสถานะโต๊ะ</a>
+                        <li class="nav__item {{ Request::is('admin/tables/availability*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.tables.availability') }}" class="nav__link">ตรวจสอบสถานะโต๊ะ</a>
                         </li>
                         <li class="nav__item {{ Request::is('admin/bookings*') ? 'active' : '' }}">
                             <a href="{{ route('admin.bookings') }}" class="nav__link">การจอง</a>
