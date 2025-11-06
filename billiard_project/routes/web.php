@@ -80,8 +80,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
      Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
      Route::post('/admin/order/complete', [AdminController::class, 'markAsCompleted'])->name('admin.order.complete');
      Route::get('/admin/users', [AdminController::class, 'manageUsers'])->name('admin.users');
+     Route::post('/admin/users/delete/{user_id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete'); 
      Route::get('/admin/branches', [AdminController::class, 'manageBranches'])->name('admin.branches');
+     Route::get('/admin/branches/edit/{branch_id}', [AdminController::class, 'editBranch'])->name('admin.branches.edit'); 
+     Route::post('/admin/branches/update/{branch_id}', [AdminController::class, 'updateBranch'])->name('admin.branches.update');
      Route::get('/admin/menus', [AdminController::class, 'manageMenus'])->name('admin.menus');
+     Route::get('/admin/menus/edit/{branch_id}/{menu_id}', [AdminController::class, 'editMenu'])->name('admin.menus.edit'); 
+     Route::post('/admin/menus/update/{branch_id}/{menu_id}', [AdminController::class, 'updateMenu'])->name('admin.menus.update'); 
+     Route::get('/admin/tables', [AdminController::class, 'manageTables'])->name('admin.tables');
      Route::get('/admin/bookings', [AdminController::class, 'manageBookings'])->name('admin.bookings');
 });
 

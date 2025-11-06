@@ -340,6 +340,18 @@ footer {
     text-align: center;
 }
 
+.login-card .alert-message {
+    width: auto;
+    padding: 15px 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
 @media (max-width: 900px) {
     .login-page-container{
         min-height: calc(100vh - var(--header-height) - 100px);
@@ -499,8 +511,16 @@ footer {
     margin: 0 auto;
 }
 
-.regis-card .alert-message.error {
-    justify-content: flex-start;
+.regis-card .alert-message {
+    width: auto;
+    padding: 15px 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1px solid transparent;
 }
 
 .regis-form-grid {
@@ -561,24 +581,20 @@ footer {
 #password {
     /* ปรับค่านี้ให้มากกว่า 40px หากไอคอนใหญ่ */
     padding-right: 40px; 
-    /* ... rest of your existing input styles ... */
 }
 
 .password-toggle-btn {
     position: absolute;
-    /* จัดตำแหน่งให้อยู่ด้านขวาและกึ่งกลางแนวตั้ง */
     top: 50%; 
-    right: 15px; /* ปรับระยะห่างจากขอบขวา */
-    transform: translateY(-50%); /* ดึงกลับขึ้นมาครึ่งหนึ่งเพื่อจัดกึ่งกลาง */
-    
-    /* สไตล์ปุ่ม */
-    background: transparent; /* ใส่เป็นโปร่งใสเพื่อให้ดูเหมือนเป็นส่วนของ input */
+    right: 15px;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0.25rem; /* เล็กลงให้ชิด input */
-    color: #666; /* สีไอคอน */
-    font-size: 1.25rem; /* ขนาดไอคอน */
-    z-index: 20; /* ให้ปุ่มอยู่เหนือ input field */
+    padding: 0.25rem;
+    color: #666;
+    font-size: 1.25rem;
+    z-index: 20;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -593,14 +609,12 @@ footer {
     outline: none;
 }
 
-/* size the inline SVG used for the password toggle */
 .password-toggle-btn svg {
     width: 1.25rem;
     height: 1.25rem;
     display: block;
 }
 
-/* Ensure the slash line inherits currentColor */
 .password-toggle-btn svg line {
     stroke: currentColor;
 }
@@ -648,11 +662,10 @@ footer {
     background-color: #1a6f08;
 }
 
-/* Cancel button used in user dashboard - match site style but indicate destructive action */
+
 .cancel-btn-custom {
     background-color: #e73c3c; /* red */
     color: white;
-    margin: 0 0 10px 0;
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
     font-family: var(--font-thai);
@@ -684,12 +697,10 @@ footer {
 }
 
 .back-link {
-    /* ทำให้ปุ่มลอยอยู่มุมซ้ายบนของ Card */
     position: absolute; 
     top: 20px;
     left: 20px;
     
-    /* สไตล์ปุ่ม */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -712,15 +723,12 @@ footer {
     height: 24px;
 }
 
-/* ตั้งค่าให้ Card เป็น Relative เพื่อให้ปุ่ม Back ถูกจัดวางได้อย่างถูกต้อง */
-/* ในกรณีนี้คือ .login-card และ .regis-card */
 .login-card, .regis-card, .booking-card {
     position: relative; 
-    /* ... สไตล์เดิมของ Card ... */
-    padding-top: 50px; /* เพิ่มพื้นที่ด้านบนสำหรับปุ่ม */
+    padding-top: 50px; 
 }
 
-/* ปรับตำแหน่ง Title ไม่ให้ชนปุ่ม */
+
 .login-card-title, .regis-card-title, .reservation-title
 , .subtitle {
     margin-top: 10px; /* หรือปรับค่า margin-top ให้เหมาะสม */
@@ -996,9 +1004,9 @@ td.status-completed,
 td.status-confirmed,
 td.status-upcoming,
 td.status-cancelled {
-    
-    text-align: center; 
-    
+
+    justify-content: center;
+
 }
 
 th {
@@ -1017,24 +1025,30 @@ tr:hover {
 
 /* Status Badges */
 .status-completed,
-.status-upcoming,
 .status-cancelled {
     font-weight: 400;
     font-size: 1.05em;
-    margin:1rem 0.2rem 0.2rem 14px;
-    padding: 8px 15px;
     border-radius: 8px;
     display: flex;
-    /* ********************************************* */
+    justify-content: center;
+}
+
+.status-upcoming{
+    font-weight: 400;
+    font-size: 1.05em;
+
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
 }
 
 .status-confirmed{
     font-weight: 400;
     font-size: 1.05em;
-    margin:0.2rem 0.2rem 0.2rem 14px;
     padding: 8px 15px;
     border-radius: 8px;
     display: flex;
+    justify-content: center;
 }
 
 .status-completed {
@@ -1617,6 +1631,7 @@ tr:hover {
 }
 
 .menu-container .add-to-cart-btn {
+    font-family: var(--font-thai);
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -1624,7 +1639,7 @@ tr:hover {
     border-radius: 6px;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 400;
     transition: background-color 0.3s;
 }
 
@@ -1999,6 +2014,7 @@ tr:hover {
     border: 1px solid #ccc;
 }
 .reward-apply-btn {
+    font-family: var(--font-thai);
     padding: 10px 20px;
     font-size: 1rem;
     font-weight: 600;
@@ -2048,6 +2064,8 @@ tr:hover {
     margin-top: 20px;
 }
 .confirm-payment-btn {
+    font-family: var(--font-thai);
+    background-color: var(--primary-color);
     display: block;
     width: 100%;
     padding: 15px;
@@ -2061,7 +2079,7 @@ tr:hover {
     text-decoration: none;
 }
 .confirm-payment-btn:hover {
-    background-color: #45a049;
+    background-color: var(--link-hover-color);
 }
 .alert-danger {
     color: #721c24;

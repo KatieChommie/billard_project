@@ -47,7 +47,10 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $branch->branch_address }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $branch->branch_phone }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $branch->time_open }} - {{ $branch->time_close }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;"><a href="#" style="color: #007bff;">แก้ไข</a></td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            {{-- **อัปเดต: ใช้ route สำหรับแก้ไขสาขา** --}}
+                            <a href="{{ route('admin.branches.edit', ['branch_id' => $branch->branch_id]) }}" style="color: #007bff;">แก้ไข</a>
+                        </td>
                     </tr>
                 @empty
                     <tr><td colspan="6" style="padding: 20px; text-align: center;">ไม่พบข้อมูลสาขา</td></tr>

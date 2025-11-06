@@ -1,4 +1,4 @@
-{{-- นี่คือไฟล์ resources/views/layouts/admin.blade.php (เวอร์ชัน Navbar บน) --}}
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -36,6 +36,9 @@
                         </li>
                         <li class="nav__item {{ Request::is('admin/menus*') ? 'active' : '' }}">
                             <a href="{{ route('admin.menus') }}" class="nav__link">เมนู</a>
+                        </li>
+                        <li class="nav__item {{ Request::is('admin/bookings*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.tables') }}" class="nav__link">จัดการสถานะโต๊ะ</a>
                         </li>
                         <li class="nav__item {{ Request::is('admin/bookings*') ? 'active' : '' }}">
                             <a href="{{ route('admin.bookings') }}" class="nav__link">การจอง</a>

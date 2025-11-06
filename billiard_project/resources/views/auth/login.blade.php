@@ -32,7 +32,7 @@
             <div class="input-group">
                 {{-- ต้องมี placeholder=" " เพื่อให้ Floating Label ทำงาน --}}
                 <input type="text" id="email" name="email" placeholder=" " value="{{ old('email') }}" required autofocus>
-                <label for="email" class="input-label">ชื่อผู้ใช้งาน / อีเมล</label>
+                <label for="email" class="input-label">อีเมล</label>
             </div>
             
             <!-- Password -->

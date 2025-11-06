@@ -14,6 +14,11 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if (session('error'))
+            <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                {{ session('error') }}
+            </div>
+        @endif
         
         <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
             <thead>
@@ -59,8 +64,11 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $user->loyalty_points }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ \Carbon\Carbon::parse($user->created_at)->format('d/m/Y') }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">
-                            <a href="#" style="color: #007bff; text-decoration: underline;">แก้ไข</a>
-                            {{-- (ปุ่มลบ สามารถเพิ่มได้ในอนาคต) --}}
+                            {{-- **อัปเดต: แทนที่ลิงก์แก้ไขด้วยปุ่มลบ** --}}
+                            <form action="{{ route('admin.users.delete', ['user_id' => $user->user_id]) }}" method="POST" style="display: inline;" onsubmit="return confirm('คุณต้องการลบผู้ใช้งาน #{{ $user->user_id }} ใช่หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้');">
+                                @csrf
+                                <button type="submit" style="color: #dc3545; text-decoration: underline; background: none; border: none; padding: 0; cursor: pointer;">ลบผู้ใช้</button>
+                            </form>
                         </td>
                     </tr>
                 @empty
