@@ -11,8 +11,6 @@
         
         <form action="{{ route('admin.tables.check') }}" method="POST" style="display: flex; gap: 15px; align-items: flex-end;">
             @csrf
-            
-            {{-- Branch Selection --}}
             <div style="flex-grow: 1;">
                 <label for="branch_id" style="display: block; font-weight: bold; margin-bottom: 5px;">สาขา:</label>
                 <select name="branch_id" id="branch_id" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%;" required>
@@ -25,13 +23,11 @@
                 </select>
             </div>
 
-            {{-- Date Selection --}}
             <div style="flex-grow: 1;">
                 <label for="date" style="display: block; font-weight: bold; margin-bottom: 5px;">วันที่:</label>
                 <input type="date" name="date" id="date" value="{{ $selectedDate }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%;" required>
             </div>
 
-            {{-- Time Selection (Step 1 hour for simplicity) --}}
             <div style="flex-grow: 1;">
                 <label for="time" style="display: block; font-weight: bold; margin-bottom: 5px;">เวลาเริ่มต้น (H:i):</label>
                 <input type="time" name="time" id="time" value="{{ $selectedTime }}" step="3600" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%;" required>
@@ -76,7 +72,7 @@
         </div>
     @elseif ($selectedBranchId)
         <div class="alert alert-info" style="background-color: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 5px;">
-            ไม่พบข้อมูลการจองในช่วงเวลาที่เลือก โต๊ะทั้งหมดควรว่าง!
+            ไม่พบข้อมูลการจองในช่วงเวลาที่เลือก
         </div>
     @endif
 

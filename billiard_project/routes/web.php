@@ -1,20 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController\DashboardController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ReviewController;
-// use App\Http\Controllers\FoodController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 /* HOME */
 Route::get('/', [SiteController::class, 'index'])->name('home');
@@ -36,7 +29,6 @@ Route::post('/checkout/process', [ReservationController::class, 'processPayment'
 
 /* MENU */
 Route::get('/menu/{branchId?}', [SiteController::class, 'menu'])->name('menu');
-Route::get('/orders/order', [SiteController::class, 'order'])->name('orders.order');
 
 /* CARTS */
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -44,7 +36,6 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::get('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-
 Route::post('/cart/checkout', [CartController::class, 'processCheckout'])
      ->middleware(['auth'])
      ->name('cart.checkout');
@@ -63,7 +54,7 @@ Route::post('/review/store', [ReviewController::class, 'store'])
     ->name('review.store')
     ->middleware('auth');
 
-/* DASHBOARDS */
+/* USER - DASHBOARDS */
 Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [DashboardController::class, 'index'])
          ->middleware(['verified']) 
@@ -74,19 +65,14 @@ Route::middleware('auth')->group(function () {
          ->name('dashboard.booking.cancel');
 });
 
-
-/* admin */
+/* ADMIN */
 Route::middleware(['auth', 'admin'])->group(function () {
      Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
      Route::post('/admin/order/complete', [AdminController::class, 'markAsCompleted'])->name('admin.order.complete');
      Route::get('/admin/users', [AdminController::class, 'manageUsers'])->name('admin.users');
      Route::post('/admin/users/delete/{user_id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete'); 
      Route::get('/admin/branches', [AdminController::class, 'manageBranches'])->name('admin.branches');
-     Route::get('/admin/branches/edit/{branch_id}', [AdminController::class, 'editBranch'])->name('admin.branches.edit'); 
-     Route::post('/admin/branches/update/{branch_id}', [AdminController::class, 'updateBranch'])->name('admin.branches.update');
      Route::get('/admin/menus', [AdminController::class, 'manageMenus'])->name('admin.menus');
-     Route::get('/admin/menus/edit/{branch_id}/{menu_id}', [AdminController::class, 'editMenu'])->name('admin.menus.edit'); 
-     Route::post('/admin/menus/update/{branch_id}/{menu_id}', [AdminController::class, 'updateMenu'])->name('admin.menus.update'); 
      Route::get('/admin/tables/availability', [AdminController::class, 'showTableAvailability'])->name('admin.tables.availability');
      Route::post('/admin/tables/availability', [AdminController::class, 'showTableAvailability'])->name('admin.tables.check');
      Route::get('/admin/bookings', [AdminController::class, 'manageBookings'])->name('admin.bookings');

@@ -20,7 +20,6 @@
         </div>
     </div>
     
-    {{-- (แสดงข้อความ Success/Error เมื่อกดปุ่ม) --}}
     @if (session('success'))
         <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 20px 0;">
             {{ session('success') }}
@@ -66,7 +65,6 @@
                         </td>
                         <td style="padding: 10px; border: 1px solid #ddd;">
                             
-                            {{-- (นี่คือปุ่มที่เรียกใช้ Logic 'markAsCompleted') --}}
                             <form action="{{ route('admin.order.complete') }}" method="POST" 
                                   onsubmit="return confirm('ยืนยันว่าลูกค้าเล่นเสร็จสิ้นแล้วใช่หรือไม่? (Order #{{ $order->order_id }})');">
                                 @csrf

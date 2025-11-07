@@ -1,5 +1,4 @@
 @extends('layouts.app')
-{{-- ... (CSS และ @push styles) ... --}}
 
 @section('content')
 <main class="reviews-container">

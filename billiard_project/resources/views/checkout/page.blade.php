@@ -10,7 +10,6 @@
         <p class="subtitle">ตรวจสอบยอดและเลือกวิธีชำระเงิน</p>
     </div>
 
-    {{-- แสดง Error / Success (ถ้ามีการใช้ส่วนลด) --}}
     @if ($errors->any())
         <div class="alert-danger">
             <ul>
@@ -26,7 +25,6 @@
         </div>
     @endif
     
-    {{-- 1. สรุปยอด (แก้ไข) --}}
     <div class="summary-box">
         <div class="summary-item">
             <span>Order ID:</span>
@@ -49,11 +47,9 @@
         </div>
     </div>
 
-    {{-- 2. (เพิ่ม) ส่วนลด --- --}}
     <div class="reward-box">
         <h3 class="reward-title">ใช้ส่วนลด (Rewards)</h3>
         
-        {{-- ถ้ายังไม่ได้ใช้ส่วนลด --}}
         @if (!$payment->reward_id)
             <form action="{{ route('checkout.apply_reward') }}" method="POST" class="reward-form">
                 @csrf
@@ -63,7 +59,6 @@
                 <select name="reward_choice" required>
                     <option value="none">-- ไม่ใช้ส่วนลด --</option>
                     @forelse ($availableRewards as $reward)
-                        {{-- (แก้ไข) ใช้ reward_id และแสดงผลที่ถูกต้อง --}}
                         <option value="{{ $reward->reward_id }}">
                             {{ $reward->reward_descrpt }} 
                             (มูลค่า {{ $reward->reward_value }} {{ $reward->reward_discount == 'percent' ? '%' : 'บาท' }})
@@ -76,13 +71,10 @@
                 <button type="submit" class="reward-apply-btn">ใช้</button>
             </form>
         
-        {{-- ถ้าใช้ส่วนลดไปแล้ว --}}
         @else
             <p class="applied-reward">
-                {{-- (แก้ไข) อ้างอิง $appliedReward->reward_descrpt --}}
                 คุณใช้ส่วนลด: {{ $appliedReward->reward_descrpt ?? 'ส่วนลด' }}
             </p>
-            {{-- (ฟอร์มสำหรับ "ยกเลิก" ส่วนลด - คงเดิม) --}}
             <form action="{{ route('checkout.apply_reward') }}" method="POST" style="margin-top: 10px;">
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $payment->order_id }}">
@@ -96,17 +88,14 @@
     </div>
 
 
-    {{-- 3. ฟอร์มยืนยัน (QR/Cash) (ไม่แก้ไข) --}}
     <form id="payment-confirmation-form" class="payment-form" action="{{ route('checkout.process') }}" method="POST">
         @csrf
         <input type="hidden" name="order_id" value="{{ $payment->order_id }}">
         <input type="hidden" name="pay_id" value="{{ $payment->pay_id }}">
         
-        {{-- (โค้ดตัวเลือก QR Code) --}}
         <div class="payment-option-box">
             <h3 class="payment-option-title">1. ชำระด้วย QR Code</h3>
             <div class="qr-code-box">
-                {{-- (สำคัญ) QR Code ต้องสร้างจาก $payment->final_amount --}}
                 <img src="{{ $qrCodeImage }}" alt="Scan QR Code to Pay">
                 <p>สแกนเพื่อชำระยอด {{ $payment->final_amount }} บาท</p>
             </div>
@@ -116,8 +105,6 @@
         </div>
 
         <div class="or-divider">--- หรือ ---</div>
-
-        {{-- (โค้ดตัวเลือก เงินสด) --}}
         <div class="payment-option-box">
             <h3 class="payment-option-title">2. ชำระด้วยเงินสด (ที่หน้าร้าน)</h3>
             <p class="cash-description">

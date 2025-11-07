@@ -16,8 +16,6 @@
         
         <form method="POST" action="{{ route('register') }}" autocomplete="off">
             @csrf
-
-            {{-- ** แสดงข้อผิดพลาด Validation ** --}}
             @if ($errors->any())
                 <div class="alert-message error">
                     <ul>

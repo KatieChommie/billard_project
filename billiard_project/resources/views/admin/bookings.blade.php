@@ -46,10 +46,10 @@
                         
                         <td style="padding: 10px; border: 1px solid #ddd;">
                             @if ($booking->order_status == 'confirmed')
-                                {{-- ถ้าจ่ายเงินแล้ว (confirmed) ให้แสดงปุ่ม "Mark as Completed" --}}
-                                <form action="{{ route('admin.bookings.complete', $booking->order_id) }}" method="POST"
+                                <form action="{{ route('admin.order.complete', $booking->order_id) }}" method="POST"
                                       onsubmit="return confirm('ยืนยันว่าลูกค้ารายนี้เล่นเสร็จสิ้นแล้ว?');">
                                     @csrf
+                                    <input type="hidden" name="order_id" value="{{ $booking->order_id }}">
                                     <button type="submit" class="btn-mark-completed" 
                                             style="background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer;">
                                         Mark as Completed
@@ -57,11 +57,8 @@
                                 </form>
                                 
                             @elseif ($booking->order_status == 'completed')
-                                {{-- ถ้าเล่นจบแล้ว (completed) ให้แสดงข้อความ --}}
                                 <span class="status-completed" style="background-color: #28a746bb; color: white; padding: 5px 10px; border-radius: 5px; border: none;">เสร็จสิ้นแล้ว</span>
-                                
                             @else
-                                {{-- (สำหรับสถานะ pending หรือ cancelled) --}}
                                 <span class="status-other" style="color: #888;">-</span>
                             @endif
                         </td>

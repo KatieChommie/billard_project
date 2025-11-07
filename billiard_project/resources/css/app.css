@@ -194,8 +194,8 @@ body{
 
 /*หน้าหลัก*/
 main {
-    padding-top: var(--header-height); /* ชดเชยความสูงของ Navbar ที่เป็น fixed */
-    min-height: calc(100vh - 4rem); /* ความสูงขั้นต่ำ */
+    padding-top: var(--header-height);
+    min-height: calc(100vh - 4rem);
     flex-grow: 1;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -205,7 +205,7 @@ main {
 footer {
     width: 100%;
     text-align: center;
-    padding: 10px 0; /* เพิ่ม Padding ด้านบนและล่าง 20px */
+    padding: 10px 0;
     font-size: 0.9rem;
     line-height: 1.5;
 }
@@ -232,16 +232,16 @@ footer {
 }
 
 .hero-section .li-of-services ul {
-    list-style: none; /* ลบจุดนำหน้าเริ่มต้นของรายการ */
+    list-style: none;
     padding: 0;
-    margin: 30px 0; /* เพิ่มช่องว่างด้านบนและล่าง */
-    text-align: center; /* จัดให้อยู่กึ่งกลาง */
+    margin: 30px 0;
+    text-align: center;
 }
 
 .hero-section .li-of-services li {
     font-weight: 300;
     color: white;
-    margin-bottom: 10px; /* เพิ่มช่องว่างระหว่างแต่ละรายการ */
+    margin-bottom: 10px;
     line-height: 1.5;
    
 }
@@ -330,7 +330,7 @@ footer {
     border-radius: 1.2rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     max-width: 420px;
-    width: 100๔;
+    width: 100;
 }
 
 .login-card h2 {
@@ -391,26 +391,21 @@ footer {
 
 
 #password {
-    /* ปรับค่านี้ให้มากกว่า 40px หากไอคอนใหญ่ */
     padding-right: 40px; 
-    /* ... rest of your existing input styles ... */
 }
 
 .password-toggle-btn {
     position: absolute;
-    /* จัดตำแหน่งให้อยู่ด้านขวาและกึ่งกลางแนวตั้ง */
     top: 50%; 
-    right: 15px; /* ปรับระยะห่างจากขอบขวา */
-    transform: translateY(-50%); /* ดึงกลับขึ้นมาครึ่งหนึ่งเพื่อจัดกึ่งกลาง */
-    
-    /* สไตล์ปุ่ม */
-    background: transparent; /* ใส่เป็นโปร่งใสเพื่อให้ดูเหมือนเป็นส่วนของ input */
+    right: 15px;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0.25rem; /* เล็กลงให้ชิด input */
-    color: #666; /* สีไอคอน */
-    font-size: 1.25rem; /* ขนาดไอคอน */
-    z-index: 20; /* ให้ปุ่มอยู่เหนือ input field */
+    padding: 0.25rem;
+    color: #666;
+    font-size: 1.25rem;
+    z-index: 20;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -425,14 +420,14 @@ footer {
     outline: none;
 }
 
-/* size the inline SVG used for the password toggle */
+
 .password-toggle-btn svg {
     width: 1.25rem;
     height: 1.25rem;
     display: block;
 }
 
-/* Ensure the slash line inherits currentColor */
+
 .password-toggle-btn svg line {
     stroke: currentColor;
 }
@@ -505,9 +500,8 @@ footer {
     padding: 20px 40px;
     border-radius: 1.2rem;
     box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    /* **ปรับความกว้างให้รองรับ 2 คอลัมน์ (จาก 700px) ** */
     max-width: 900px; 
-    width: 100%; /* ใช้เปอร์เซ็นต์ร่วมด้วย */
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -526,7 +520,7 @@ footer {
 .regis-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr; 
-    gap: 20px 30px; /* ระยะห่างระหว่างแถวและคอลัมน์ */
+    gap: 20px 30px;
 }
 @media (max-width: 900px) {
     .regis-page-container{
@@ -579,7 +573,6 @@ footer {
 }
 
 #password {
-    /* ปรับค่านี้ให้มากกว่า 40px หากไอคอนใหญ่ */
     padding-right: 40px; 
 }
 
@@ -706,19 +699,18 @@ footer {
     justify-content: center;
     width: 40px; 
     height: 40px; 
-    color: #333; /* สีของไอคอน */
-    text-decoration: none; /* ลบเส้นใต้ลิงก์ */
-    border-radius: 50%; /* ทำให้เป็นวงกลม */
+    color: #333;
+    text-decoration: none;
+    border-radius: 50%;
     transition: background-color 0.2s;
-    z-index: 10; /* ให้ปุ่มอยู่เหนือองค์ประกอบอื่น */
+    z-index: 10;
 }
 
 .back-link:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* สีพื้นหลังเมื่อวางเมาส์ */
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .back-icon {
-    /* ขนาดไอคอน */
     width: 24px;
     height: 24px;
 }
@@ -731,7 +723,7 @@ footer {
 
 .login-card-title, .regis-card-title, .reservation-title
 , .subtitle {
-    margin-top: 10px; /* หรือปรับค่า margin-top ให้เหมาะสม */
+    margin-top: 10px;
 }
 
 /*Admin Dashboard*/
@@ -740,13 +732,12 @@ footer {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #2c3e50; /* ❗️ สีเข้มสไตล์แอดมิน */
+    background-color: #2c3e50;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
     height: var(--header-height);
 }
 
-/* (ใช้ .header__container ซ้ำได้ แต่ต้องปรับสี) */
 .admin-header .header__container {
     height: 100%;
     display: flex;
@@ -756,7 +747,7 @@ footer {
 }
 
 .admin-header .header__logo {
-    color: white; /* ❗️ โลโก้สีขาว */
+    color: white;
     font-size: 1.5rem;
     font-weight: 600;
     text-decoration: none;
@@ -774,7 +765,7 @@ footer {
 }
 
 .admin-header .nav__link {
-    color: #ecf0f1; /* ❗️ ลิงก์สีขาวนวล */
+    color: #ecf0f1;
     font-weight: 400;
     text-decoration: none;
     transition: color 0.3s;
@@ -785,7 +776,6 @@ footer {
     color: var(--link-hover-color);
 }
 
-/* ❗️ สไตล์สำหรับ "เมนูที่กำลังถูกเลือก" */
 .admin-header .nav__item.active .nav__link {
     color: var(--secondary-color);
     font-weight: 500;
@@ -793,23 +783,19 @@ footer {
 }
 
 .admin-header .header__actions .nav__button--logout {
-    background-color: #e73c3c; /* ❗️ ปุ่ม Logout สีแดง */
+    background-color: #e73c3c;
 }
 .admin-header .header__actions .nav__button--logout:hover {
     background-color: #c0392b;
 }
 
-
-/* --- 2. Admin Content Area --- */
 .admin-content-area {
-    /* ❗️ ชดเชยความสูง Navbar ที่เป็น fixed */
     padding-top: var(--header-height);
     min-height: 100vh;
     flex-grow: 1;
-    background-color: #f4f7f6; /* ❗️ สีพื้นหลังอ่อนๆ */
+    background-color: #f4f7f6;
 }
 
-/* (เพิ่ม Wrapper ให้เนื้อหาไม่ติดขอบจอ) */
 .admin-content-wrapper {
     max-width: 1400px;
     margin: 0 auto;
@@ -820,7 +806,6 @@ footer {
     padding-bottom: 20px;
 }
 
-/* (Widgets จากครั้งที่แล้ว) */
 .widget {
     background-color: white;
     padding: 1.5rem;
@@ -846,7 +831,6 @@ footer {
     gap: 1.5rem;
 }
 
-/* (Panels จากครั้งที่แล้ว) */
 .admin-section-title {
     font-size: 1.5rem; font-weight: 600; color: #333;
     margin-top: 2.5rem; margin-bottom: 1.5rem;
@@ -885,7 +869,7 @@ footer {
 }
 
 .sortable-link {
-    color: inherit; /* ใช้สีเดียวกับหัวตาราง */
+    color: inherit; 
     text-decoration: none;
     font-weight: bold;
 }
@@ -944,7 +928,6 @@ section {
     padding: 20px 0;
 }
 
-/* --- User Info Section --- */
 .user-info-section p {
     margin: 8px 0;
 }
@@ -974,7 +957,6 @@ section {
     font-size: 1.7em;
 }
 
-/* --- ประวัติการจอง--- */
 .table-responsive {
     overflow-x: auto;
 }
@@ -1071,9 +1053,9 @@ tr:hover {
 }
 
 .pay-button, .cancel-btn-custom{
-    display: inline-flex; /* keep them inline with surrounding text */
+    display: inline-flex;
     align-items: center;
-    gap: 8px; /* internal gap for icon + label if any */
+    gap: 8px;
 }
 
 .pay-button {
@@ -1082,7 +1064,7 @@ tr:hover {
     text-decoration: none;
     padding: 8px 15px;
     border-radius: 8px;
-    margin-right: 10px; /* space between pay and cancel buttons */
+    margin-right: 10px;
 }
 
 .pay-button:hover{
@@ -1096,19 +1078,17 @@ tr:hover {
     border-radius: 8px;
 }
 
-/* Action buttons container to keep multiple actions on one line */
 .action-buttons{
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px; /* space between buttons */
+    gap: 10px;
 }
 
 .cancel-btn-custom:hover{
     background-color: #dc3546ce;
 }
 
-/* --- Review History Section --- */
 .review-item {
     border: 1px solid #e9ecef;
     padding: 15px;
@@ -1137,7 +1117,6 @@ tr:hover {
     color: #6c757d;
 }
 
-/* --- Responsive Design (Optional but Recommended) --- */
 @media (max-width: 768px) {
     .dashboard-container {
         padding: 20px 15px;
@@ -1157,7 +1136,6 @@ tr:hover {
     padding-top: 2rem;
     margin: 2rem auto;
 }
-/*back button*/
 
 .points-container .back-link {
     width: auto; 
@@ -1266,7 +1244,7 @@ tr:hover {
 .tab-link:hover {
     background-color: #e9e9e9;
 }
-/* สไตล์ของแท็บที่กำลังถูกเลือก */
+
 .tab-link.active {
     background-color: rgb(255, 255, 255);
     color: var(--primary-color);
@@ -1311,10 +1289,10 @@ tr:hover {
     font-weight: 600;
 }
 .points-change.received {
-    color: #28a745; /* สีเขียว */
+    color: #28a745;
 }
 .points-change.redeemed {
-    color: #dc3545; /* สีแดง */
+    color: #dc3545;
 }
 
 .reward-store-grid {
@@ -1444,12 +1422,11 @@ tr:hover {
 }
 
 .menu-container h1 {
-    color: white; /* หัวข้อหลักยังคงเป็นสีขาว */
+    color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin-bottom: 10px;
 }
 
-/* CONTAINER/WRAPPER สำหรับ Dropdown */
 .branch-selector {
     display: flex;
     justify-content: center;
@@ -1457,7 +1434,6 @@ tr:hover {
     margin-bottom: 20px;
 }
 
-/* LABEL ของ Dropdown */
 .branch-selector label {
     color: white; /* สีข้อความให้เข้ากับพื้นหลังเข้ม */
     font-weight: 500;
@@ -1466,16 +1442,12 @@ tr:hover {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* DROP DOWN LIST หลัก (#branch-select) */
 #branch-select {
-    /* รีเซ็ตลักษณะเริ่มต้นของเบราว์เซอร์ */
-    -webkit-appearance: none;  /*สำหรับ Chrome/Safari */
+    -webkit-appearance: none;
 
-
-    /* สไตล์หลัก */
     background-color: white;
     color: var(--text-color);
-    padding: 10px 40px 10px 20px; /* เพิ่ม padding ขวาสำหรับไอคอนลูกศร */
+    padding: 10px 40px 10px 20px;
     border-radius: 8px;
     font-family: var(--font-thai);
     font-size: 1rem;
@@ -1492,20 +1464,18 @@ tr:hover {
 }
 
 .branch-selector {
-    /* ทำให้ Dropdown ถูกหุ้มด้วย position: relative */
     position: relative;
 }
 
 .branch-selector::after {
-    /* เพิ่มไอคอนลูกศรลงไปใน Dropdown List */
     content: '▼'; 
     position: absolute;
-    right: calc(50% - 135px); /* ปรับตำแหน่งให้เหมาะสม */
+    right: calc(50% - 135px);
     top: 50%;
     transform: translateY(-50%);
     font-size: 0.8rem;
     color: var(--primary-color);
-    pointer-events: none; /* ให้คลิกผ่านไปที่ select ได้ */
+    pointer-events: none;
 }
 
 /* categories */
@@ -1513,7 +1483,7 @@ tr:hover {
 .category-tabs {
     width: 100%;
     max-width: 600px;
-    margin: 20px auto 30px; /* จัดกึ่งกลางและเพิ่มระยะห่าง */
+    margin: 20px auto 30px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -1531,9 +1501,9 @@ tr:hover {
     cursor: pointer;
     font-size: 1.1rem;
     font-weight: 500;
-    color: #6c757d; /* สีข้อความปกติ */
+    color: #6c757d;
     transition: color 0.2s, border-bottom 0.3s;
-    position: relative; /* ใช้สำหรับขีดเส้นใต้ */
+    position: relative; 
 }
 
 .tab-item:hover {
@@ -1541,7 +1511,7 @@ tr:hover {
 }
 
 .tab-item.active {
-    color: var(--primary-color); /* สีข้อความเมื่อ Active */
+    color: var(--primary-color);
     font-weight: 600;
 }
 
@@ -1550,7 +1520,7 @@ tr:hover {
     position: absolute;
     bottom: 0;
     left: 10%;
-    width: 80%; /* ความกว้างของขีดเส้นใต้ */
+    width: 80%;
     height: 3px;
     background-color: var(--primary-color);
     border-radius: 2px;
@@ -1561,10 +1531,9 @@ tr:hover {
     display: none;
 }
 
-/* 🚩 ส่วนเพิ่มเติม: สไตล์สำหรับหัวข้อหมวดหมู่ (ต้องเพิ่มใน HTML) */
 .menu-category-header {
     text-align: left;
-    color: white; /* หัวข้อหมวดหมู่ย่อยเป็นสีขาวให้ตัดกับพื้นหลัง */
+    color: white; 
     font-size: 2.2rem;
     font-weight: 600;
     margin-top: 45px;
@@ -1574,7 +1543,6 @@ tr:hover {
 }
 
 .menu-container .menu-grid {
-    /* ใช้สำหรับจัดโครงสร้างหลักของไอเทมทั้งหมด */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
@@ -1582,24 +1550,24 @@ tr:hover {
 }
 
 .menu-container .menu-item {
-    padding-bottom: 15px; /* ลด padding ด้านล่าง */
-    border-radius: 12px; /* มุมโค้งมนมากขึ้น */
-    height: 100%; /* ทำให้ความสูงของทุกกล่องเท่ากัน */
+    padding-bottom: 15px;
+    border-radius: 12px;
+    height: 100%;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    background-color: white; /* เปลี่ยนเป็นสีขาวล้วนเพื่อความสะอาด */
+    background-color: white;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
 }
 
 .menu-container .menu-item:hover {
-    transform: translateY(-5px); /* เพิ่มเอฟเฟกต์ยกขึ้นเมื่อชี้ */
+    transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
 
 .menu-container .menu-item img {
     width: 100%;
-    height: 300px; /* กำหนดความสูงภาพคงที่ */
-    object-fit: cover; /* ครอบคลุมพื้นที่โดยไม่ยืดภาพ */
+    height: 300px;
+    object-fit: cover;
     border-top-right-radius: 12px;
     border-top-left-radius: 12px;
 }
@@ -1608,7 +1576,7 @@ tr:hover {
     color: var(--text-color);
     padding: 10px 10px 5px;
     font-size: 1.2rem;
-    min-height: 50px; /* เว้นที่สำหรับชื่อยาวหลายบรรทัด */
+    min-height: 50px;
 }
 
 .menu-container .tag {
@@ -1620,7 +1588,7 @@ tr:hover {
     font-weight: 600;
     text-transform: uppercase;
     color: white;
-    background-color: var(--primary-color); /* ใช้สีหลักของเว็บไซต์ */
+    background-color: var(--primary-color);
 }
 
 .menu-container .price {
@@ -1747,16 +1715,16 @@ tr:hover {
 .booking-page-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* จัดให้อยู่ด้านบน ไม่ใช่กึ่งกลางจอ */
+    align-items: flex-start;
     padding-top: 50px;
     padding-bottom: 50px;
     min-height: 100vh;
 }
 
 .booking-card {
-    background-color: #f7f7f7; /* สีพื้นหลังอ่อน (คล้ายใน Figma) */
+    background-color: #f7f7f7;
     padding: 35px;
-    border-radius: 15px; /* ขอบมน */
+    border-radius: 15px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
     max-width: 800px;
     width: 90%;
@@ -1796,9 +1764,8 @@ tr:hover {
     text-align: center;
 }
 
-/* 1. สไตล์ส่วนเลือกวันที่และเวลา */
 .datetime-selection-box {
-    background-color: white; /* พื้นหลังขาวสำหรับส่วน Date/Time */
+    background-color: white; 
     padding: 25px;
     border-radius: 10px;
     margin-bottom: 30px;
@@ -1828,7 +1795,6 @@ tr:hover {
     font-family: inherit;
     font-size: 1rem;
     box-sizing: border-box;
-    /* สไตล์เฉพาะสำหรับ Date input */
     background: url('/path/to/calendar-icon.png') no-repeat right 10px center;
 }
 
@@ -1836,7 +1802,7 @@ tr:hover {
     font-family: var(--font-thai);
     background-color: var(--primary-color);
     color: white;
-    margin: 10px auto; /* center horizontally */
+    margin: 10px auto;
     padding: 10px 18px;
     border: none;
     border-radius: 6px;
@@ -1844,14 +1810,12 @@ tr:hover {
     font-weight: 400;
     font-size: 1rem;
     transition: background-color 0.2s;
-    display: inline-block; /* allow auto width and centering */
+    display: inline-block;
     min-width: 160px;
     max-width: 320px;
     width: auto;
 }
 
-
-/* 2. สไตล์ส่วนแสดงผลโต๊ะ */
 .table-selection-area {
     padding: 20px;
     margin-top: 20px;
@@ -1859,7 +1823,7 @@ tr:hover {
 
 .table-grid-buttons {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 คอลัมน์ตามภาพ */
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
 }
 
@@ -1870,10 +1834,9 @@ tr:hover {
     font-size: 1.2rem;
     font-weight: 300;
     color: rgb(0, 0, 0);
-    border: 3px solid transparent; /* 1.1 เพิ่มขอบใสๆ ไว้ก่อน (เพื่อไม่ให้ layout กระโดด) */
+    border: 3px solid transparent; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
-    /* 1.2 เพิ่ม transition ให้ครบทุกอย่าง */
     transition: background-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
@@ -1889,7 +1852,6 @@ tr:hover {
     font-size: 0.8rem;
     font-weight: 400;
     opacity: 0.9;
-    /* (บังคับใส่สีกลับเข้าไป) */
     color: rgb(0, 0, 0);
 }
 
@@ -1901,21 +1863,16 @@ tr:hover {
     box-shadow: 0 0 10px rgba(5, 141, 34, 0.5);
 }
 
-
-/* 5. กฎความปลอดภัย (กัน Error) */
-/* * ถ้าโต๊ะสีแดง/เทา ถูก JS สั่งให้ .selected (ซึ่งไม่ควรเกิด)
- * ให้บังคับมันกลับไปเป็นสีเดิม
-*/
 .table-btn.status-red.selected,
 .table-btn.status-gray.selected {
-    background-color: #dc3545; /* บังคับเป็นสีแดง */
-    color: rgb(0, 0, 0);       /* บังคับสีตัวอักษรกลับ */
-    border-color: transparent; /* บังคับขอบกลับ */
+    background-color: #dc3545;
+    color: rgb(0, 0, 0);  
+    border-color: transparent;
     transform: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 .table-btn.status-gray.selected {
-     background-color: #6c757d; /* บังคับเป็นสีเทา */
+     background-color: #6c757d;
 }
 
 
@@ -1984,14 +1941,14 @@ tr:hover {
 .summary-item.total {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #E53E3E; /* (สีแดง) */
+    color: #E53E3E;
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px dashed #ccc;
 }
 .reward-box {
-    background-color: #fffaf0; /* (สีเหลืองอ่อน) */
-    border: 1px dashed #F6E05E; /* (สีเหลือง) */
+    background-color: #fffaf0;
+    border: 1px dashed #F6E05E;
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 25px;
@@ -2019,7 +1976,7 @@ tr:hover {
     font-size: 1rem;
     font-weight: 600;
     color: #fff;
-    background-color: #F6E05E; /* (สีเหลือง) */
+    background-color: #F6E05E;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -2027,12 +1984,11 @@ tr:hover {
 .applied-reward {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #4CAF50; /* (สีเขียว) */
+    color: #4CAF50;
 }
     
-/* (แก้ไข) สรุปยอด */
 .summary-item.discount {
-    color: #E53E3E; /* (สีแดง) */
+    color: #E53E3E;
 }
 .summary-item.final-total {
     font-size: 1.5rem;

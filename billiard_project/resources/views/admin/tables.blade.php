@@ -14,13 +14,9 @@
                     @php
                     function renderSortableHeader($columnName, $displayName, $currentSort, $currentDir) {
                         $isCurrent = $currentSort == $columnName;
-                        // (Logic สลับทิศทาง)
                         $newDirection = ($isCurrent && $currentDir == 'asc') ? 'desc' : 'asc';
-                        // (Logic แสดงลูกศร)
                         $arrow = $isCurrent ? ($currentDir == 'asc' ? '&uarr;' : '&darr;') : '';
-
                         $url = route('admin.tables', ['sort' => $columnName, 'direction' => $newDirection]);
-                        
                         echo "<th style=\"padding: 10px; border: 1px solid #ddd; text-align: left;\">
                                 <a href=\"{$url}\" class=\"sortable-link\">
                                     {$displayName} <span class=\"arrow\">{$arrow}</span>
@@ -39,14 +35,13 @@
             <tbody>
                 @forelse ($tables as $table)
                     @php
-                        // กำหนดสีตามสถานะ
                         $statusText = ucfirst($table->table_status);
-                        $statusColor = 'background-color: #fff; color: #333;'; // Default
+                        $statusColor = 'background-color: #fff; color: #333;';
 
                         if ($table->table_status === 'available') {
                             $statusColor = 'background-color: #d4edda; color: #155724; font-weight: bold;'; // Green
                         } elseif ($table->table_status === 'unavailable') {
-                            $statusColor = 'background-color: #f8d7da; color: #721c24;'; // Red
+                            $statusColor = 'background-color: #f8d7da; color: #721c24;';
                         }
                     @endphp
                     <tr style="border-bottom: 1px solid #eee;">

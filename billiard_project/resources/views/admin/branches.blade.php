@@ -14,13 +14,9 @@
                 @php
                 function renderSortableHeader($columnName, $displayName, $currentSort, $currentDir) {
                     $isCurrent = $currentSort == $columnName;
-                    // (Logic สลับทิศทาง)
                     $newDirection = ($isCurrent && $currentDir == 'asc') ? 'desc' : 'asc';
-                    // (Logic แสดงลูกศร)
                     $arrow = $isCurrent ? ($currentDir == 'asc' ? '&uarr;' : '&darr;') : '';
-
                     $url = route('admin.branches', ['sort' => $columnName, 'direction' => $newDirection]);
-                    
                     echo "<th style=\"padding: 10px; border: 1px solid #ddd; text-align: left;\">
                             <a href=\"{$url}\" class=\"sortable-link\">
                                 {$displayName} <span class=\"arrow\">{$arrow}</span>
@@ -31,11 +27,10 @@
 
                 {!! renderSortableHeader('branch_id', 'ID', $sortColumn, $sortDirection) !!}
                 <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">ชื่อสาขา</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">ข้อมูลสาขา</th>
                 <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">ที่อยู่</th>
                 <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">เบอร์โทร</th>
                 {!! renderSortableHeader('time_open', 'เวลาเปิด - ปิด', $sortColumn, $sortDirection) !!}
-                
-                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -47,10 +42,7 @@
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $branch->branch_address }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $branch->branch_phone }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd;">{{ $branch->time_open }} - {{ $branch->time_close }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">
-                            {{-- **อัปเดต: ใช้ route สำหรับแก้ไขสาขา** --}}
-                            <a href="{{ route('admin.branches.edit', ['branch_id' => $branch->branch_id]) }}" style="color: #007bff;">แก้ไข</a>
-                        </td>
+                        
                     </tr>
                 @empty
                     <tr><td colspan="6" style="padding: 20px; text-align: center;">ไม่พบข้อมูลสาขา</td></tr>

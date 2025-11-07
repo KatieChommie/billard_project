@@ -38,12 +38,11 @@
                             </h4>
                             <span class="rating" style="font-size: 1.2rem; color: #facc15;">
                                 @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $review->rating) ⭐ @else <span style="color: #ccc;">☆</span> @endif
+                                    @if ($i <= $review->rating) ⭐11 @else <span style="color: #ccc;">☆</span> @endif
                                 @endfor
                             </span>
                         </div>
                         <p class="review-comment" style="margin-top: 0.5rem; color: #333;">
-                            {{-- (ใช้ $review->comment เพราะเราตั้งชื่อแฝงใน Controller) --}}
                             "{{ $review->comment ?? 'ไม่มีความคิดเห็น' }}"
                         </p>
                         <small style="display: block; text-align: right; color: #999; margin-top: 0.5rem;">

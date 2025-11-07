@@ -10,28 +10,19 @@
             </svg>
             <span style="color: white;">กลับไปยังแดชบอร์ดผู้ใช้</span>
     </a>
-    {{-- ส่วนที่ 1: แสดงคะแนนปัจจุบัน (เหมือนเดิม) --}}
     <div class="current-points-box">
         <p>คะแนนสะสมของคุณ</p>
         <span class="points-value">{{ $currentPoints }}</span>
         <span class="points-unit">แต้ม</span>
     </div>
-
-    {{-- ส่วนที่ 2: แถบนำทาง (เหมือนเดิม) --}}
     <div class="points-navigation">
         <a href="{{ route('points.index') }}" class="nav-button" >แลกคะแนน</a>
         <a href="{{ route('points.history') }}" class="nav-button active">ประวัติ</a>
     </div>
-
-    {{-- ส่วนที่ 3: แท็บสลับ (ส่วนที่เพิ่มใหม่) --}}
     <div class="history-tabs">
-        {{-- ปุ่มสลับแท็บ --}}
         <button class="tab-link active" onclick="openTab(event, 'received-content')">ได้รับ (Received)</button>
         <button class="tab-link" onclick="openTab(event, 'redeemed-content')">ใช้ไป (Used)</button>
     </div>
-
-    {{-- ส่วนที่ 4: เนื้อหาของแท็บ (ส่วนที่แก้ไข) --}}
-
     <div id="received-content" class="tab-content active">
         <div class="transaction-list">
             @forelse ($received as $tx)
@@ -68,20 +59,15 @@
 
 <script>
     function openTab(evt, tabName) {
-        // 1. ซ่อนเนื้อหา .tab-content ทั้งหมด
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tab-content");
         for (i = 0; i < tabcontent.length; i++) {
             tabcontent[i].style.display = "none";
         }
-
-        // 2. ลบ class 'active' ออกจากปุ่ม .tab-link ทั้งหมด
         tablinks = document.getElementsByClassName("tab-link");
         for (i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
-
-        // 3. แสดงเนื้อหาแท็บที่เลือก และเพิ่ม class 'active' ให้ปุ่ม
         document.getElementById(tabName).style.display = "block";
         evt.currentTarget.className += " active";
     }

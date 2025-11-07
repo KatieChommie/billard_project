@@ -15,7 +15,6 @@
 
     <h1 style="text-align: center; margin-bottom: 1.5rem;">ตะกร้าสินค้า</h1>
 
-    {{-- (แสดง Error/Success Messages) --}}
     @if(session('success'))
         <div class="alert-success" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin: 15px 0;">
             {{ session('success') }}
@@ -45,14 +44,13 @@
         @if ($cartTable)
             สั่งอาหารล่วงหน้าสำหรับโต๊ะนี้
         @else
-            รายการอาหาร (สั่งกลับบ้าน)
+            รายการอาหาร
         @endif
     </h4>
 
     <div class="cart-items-list">
         @forelse ($cartItems as $id => $details)
             <div class="cart-item">
-                {{-- (คุณสามารถเพิ่มรูปภาพตรงนี้ได้ ถ้าส่งมาจาก CartController) --}}
                 
                 <div class="cart-item-details">
                     <h4>{{ $details['menu_name'] }}</h4>
@@ -61,7 +59,6 @@
                 </div>
                 
                 <div class="cart-item-actions">
-                    {{-- (ฟอร์ม Update) --}}
                     <form action="{{ route('cart.update') }}" method="POST">
                         @csrf
                         <input type="hidden" name="menu_id" value="{{ $id }}">
@@ -69,7 +66,6 @@
                         <button type="submit" class="update-btn">อัปเดต</button>
                     </form>
                     
-                    {{-- (ฟอร์ม Remove) --}}
                     <form action="{{ route('cart.remove') }}" method="POST">
                         @csrf
                         <input type="hidden" name="menu_id" value="{{ $id }}">
@@ -78,13 +74,13 @@
                 </div>
             </div>
         @empty
-            @if (!$cartTable) {{-- ถ้าไม่มีโต๊ะด้วย --}}
+            @if (!$cartTable)
                 <p style="text-align: center; font-size: 1.2rem; color: #555;">
                     ตะกร้าสินค้าของคุณว่างเปล่า
                 </p>
             @else
                 <p style="text-align: center; font-size: 1rem; color: #555;">
-                    คุณยังไม่ได้สั่งอาหารล่วงหน้า
+                    คุณยังไม่ได้สั่งอาหาร
                 </p>
             @endif
         @endforelse
@@ -97,7 +93,6 @@
         </a>
     </div>
 
-    {{-- (แสดงผลรวมเฉพาะเมื่อมีสินค้า) --}}
     @if (count($cartItems) > 0 || $cartTable)
         <div class="cart-summary">
             <h3>ยอดรวมทั้งหมด: {{ number_format($total, 2) }} THB</h3>

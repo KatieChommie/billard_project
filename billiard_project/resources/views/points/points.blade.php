@@ -13,12 +13,10 @@
             <span style="color: white;">กลับไปยังแดชบอร์ดผู้ใช้</span>
     </a>
 
-    {{-- 1. แสดงแต้ม --}}
     <div class="current-points-box">
         คะแนนสะสมปัจจุบัน: <span class="points-value">{{ number_format($currentPoints) }}</span> แต้ม
     </div>
 
-    {{-- 2. (แก้ไข) ย้ายลิงก์ประวัติมาไว้ตรงนี้ --}}
     <div class="history-link-box">
         <a href="{{ route('points.history') }}" class="nav-button">
             ดูประวัติการใช้แต้ม
@@ -26,7 +24,6 @@
         
     </div>
 
-    {{-- 3. แสดง Error/Success --}}
     @if(session('success'))
         <div class="alert-message alert-success">{{ session('success') }}</div>
     @endif
@@ -34,12 +31,10 @@
         <div class="alert-message alert-error">{{ session('error') }}</div>
     @endif
     
-    {{-- 4. (แก้ไข) "ร้านค้า" และ "เช็คอิน" --}}
     <section class="reward-redeem-section">
         <h2 class="section-title">รับแต้มสะสม แลกแต้มสะสม</h2>
         <div class="reward-store-grid">
             
-            {{-- (ใหม่) การ์ดเช็คอินรายวัน (แบบในรูป) --}}
             <div class="redeem-card">
                 <div>
                     <h3 style="color: #E6A23C;">&#127881; เช็คอินรายวัน</h3>
@@ -55,7 +50,6 @@
                 </form>
             </div>
 
-            {{-- (ของเดิม) การ์ดแลกคูปอง --}}
             @foreach ($redeemableRewards as $rewardDef)
                 <div class="redeem-card">
                     <div>
@@ -85,13 +79,11 @@
         </div>
     </section>
     
-    {{-- 5. "คูปองของฉัน" (เหมือนเดิม) --}}
     <section class="my-rewards-section">
         <h2 class="section-title">คูปองส่วนลดของฉัน (ที่พร้อมใช้งาน)</h2>
         <div class="my-coupons-list">
             @forelse ($myActiveCoupons as $coupon)
                 <div class="coupon-item">
-                    {{-- (อ้างอิง field จากตาราง reward) --}}
                     <h4>{{ $coupon->reward_descrpt }}</h4> 
                     <p class="expiry">
                         (มูลค่า: {{ $coupon->reward_value }} {{ $coupon->reward_discount == 'percent' ? '%' : 'บาท' }})

@@ -68,6 +68,7 @@
                                 {{ implode(' + ', $services) }}
                             </td>
                             <td>{{ $booking->branch_name ?? '-' }}</td>
+                            
                             <td>
                                 {{ \Carbon\Carbon::parse($booking->display_time)->format('d/m/Y - H:i') }}
                             </td>
@@ -105,8 +106,6 @@
                                         </form>
                                     </div>
                                 @elseif ($booking->order_status == 'completed')
-            
-                                    {{-- (แก้ไข) เช็คว่า branch_id นี้ อยู่ในลิสต์ที่รีวิวแล้วหรือยัง --}}
                                     @if ($booking->has_table && $booking->branch_id)
                                         @if ($booking->has_reviewed)
                                             <span style="color: #666; font-style: italic;">รีวิวแล้ว</span>
@@ -142,7 +141,6 @@
             @forelse ($reviewHistory as $review)
                 <div class="review-item" style="border-bottom: 1px solid #eee; padding-bottom: 1rem; margin-bottom: 1rem;">
                     
-                    {{-- (แสดง สาขา และ ดาว) --}}
                     <p class="review-meta">
                         <strong>สาขา:</strong> {{ $review->branch_name }} | 
                         <strong>คะแนน:</strong> 
@@ -153,18 +151,15 @@
                         </span>
                     </p>
                     
-                    {{-- (แสดง คอมเมนต์) --}}
                     <p class="review-text" style="font-style: italic; color: #333; margin: 0.5rem 0;">
                         "{{ $review->review_descrpt }}"
                     </p>
                     
-                    {{-- (แสดง วันที่) --}}
                     <p class="review-date" style="font-size: 0.85rem; color: #888;">
                         รีวิวเมื่อ: {{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y') }}
                     </p>
                 </div>
             @empty
-                {{-- (กรณีที่ยังไม่เคยรีวิว) --}}
                 <div class="review-item">
                     <p style="text-align: center; color: #777;">คุณยังไม่มีประวัติการรีวิว</p>
                 </div>
